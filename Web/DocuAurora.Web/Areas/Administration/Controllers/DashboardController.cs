@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.Areas.Administration.Controllers
+﻿namespace DocuAurora.API.Areas.Administration.Controllers
 {
     using DocuAurora.Services.Data;
     using DocuAurora.Web.ViewModels.Administration.Dashboard;
@@ -16,8 +16,8 @@
 
         public IActionResult Index()
         {
-            var viewModel = new IndexViewModel { SettingsCount = this.settingsService.GetCount(), };
-            return this.View(viewModel);
+            var viewModel = new IndexViewModel { SettingsCount = settingsService.GetCount(), };
+            return View(viewModel);
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace DocuAurora.Web.Controllers
+﻿namespace DocuAurora.API.Controllers
 {
     using System;
     using System.Threading.Tasks;
-
+    using DocuAurora.API.ViewModels.Settings;
     using DocuAurora.Data.Common.Repositories;
     using DocuAurora.Data.Models;
     using DocuAurora.Services.Data;
-    using DocuAurora.Web.ViewModels.Settings;
 
     using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +23,9 @@
 
         public IActionResult Index()
         {
-            var settings = this.settingsService.GetAll<SettingViewModel>();
+            var settings = settingsService.GetAll<SettingViewModel>();
             var model = new SettingsListViewModel { Settings = settings };
-            return this.View(model);
+            return View(model);
         }
 
         public async Task<IActionResult> InsertSetting()
@@ -34,10 +33,10 @@
             var random = new Random();
             var setting = new Setting { Name = $"Name_{random.Next()}", Value = $"Value_{random.Next()}" };
 
-            await this.repository.AddAsync(setting);
-            await this.repository.SaveChangesAsync();
+            await repository.AddAsync(setting);
+            await repository.SaveChangesAsync();
 
-            return this.RedirectToAction(nameof(this.Index));
+            return RedirectToAction(nameof(this.Index));
         }
     }
 }

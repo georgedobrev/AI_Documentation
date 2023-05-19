@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.Tests
+﻿namespace DocuAurora.API.Tests
 {
     using System.Net;
     using System.Threading.Tasks;
