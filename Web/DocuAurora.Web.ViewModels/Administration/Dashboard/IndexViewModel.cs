@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.ViewModels.Administration.Dashboard
+﻿namespace DocuAurora.API.ViewModels.Administration.Dashboard
 {
     public class IndexViewModel
     {

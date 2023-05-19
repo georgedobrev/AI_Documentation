@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.ViewModels.Settings
+﻿namespace DocuAurora.API.ViewModels.Settings
 {
     using DocuAurora.Data.Models;
     using DocuAurora.Services.Mapping;

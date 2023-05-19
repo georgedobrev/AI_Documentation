@@ -1,7 +1,7 @@
-﻿namespace DocuAurora.Web.Areas.Administration.Controllers
+﻿namespace DocuAurora.API.Areas.Administration.Controllers
 {
+    using DocuAurora.API.Controllers;
     using DocuAurora.Common;
-    using DocuAurora.Web.Controllers;
 
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;

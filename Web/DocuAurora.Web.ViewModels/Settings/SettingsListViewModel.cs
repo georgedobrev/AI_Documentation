@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.ViewModels.Settings
+﻿namespace DocuAurora.API.ViewModels.Settings
 {
     using System.Collections.Generic;
 

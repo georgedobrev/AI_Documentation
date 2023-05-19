@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Web.Controllers
+﻿namespace DocuAurora.API.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
 
