@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Web\DocuAurora.Web\DocuAurora.Web.csproj" />
+    <ProjectReference Include="..\..\Web\DocuAurora.Web\DocuAurora.API.csproj" />
   </ItemGroup>
 
 </Project>

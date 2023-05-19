@@ -1,7 +1,7 @@
-﻿namespace DocuAurora.Web
+﻿namespace DocuAurora.API
 {
     using System.Reflection;
-
+    using DocuAurora.API.ViewModels;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -11,7 +11,6 @@
     using DocuAurora.Services.Data;
     using DocuAurora.Services.Mapping;
     using DocuAurora.Services.Messaging;
-    using DocuAurora.Web.ViewModels;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
