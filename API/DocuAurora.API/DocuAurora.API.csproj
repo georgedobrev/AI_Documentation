@@ -14,7 +14,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<InternalsVisibleTo Include="DocuAurora.Web.Tests" />
+		<InternalsVisibleTo Include="DocuAurora.API.Tests" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -37,7 +37,7 @@
     <ProjectReference Include="..\..\Services\DocuAurora.Services.Mapping\DocuAurora.Services.Mapping.csproj" />
     <ProjectReference Include="..\..\Services\DocuAurora.Services.Messaging\DocuAurora.Services.Messaging.csproj" />
     <ProjectReference Include="..\..\Services\DocuAurora.Services\DocuAurora.Services.csproj" />
-    <ProjectReference Include="..\DocuAurora.Web.Infrastructure\DocuAurora.API.Infrastructure.csproj" />
-    <ProjectReference Include="..\DocuAurora.Web.ViewModels\DocuAurora.API.ViewModels.csproj" />
+    <ProjectReference Include="..\DocuAurora.API.Infrastructure\DocuAurora.API.Infrastructure.csproj" />
+    <ProjectReference Include="..\DocuAurora.API.ViewModels\DocuAurora.API.ViewModels.csproj" />
   </ItemGroup>
 </Project>
