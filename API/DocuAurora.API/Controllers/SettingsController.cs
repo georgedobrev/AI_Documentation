@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using DocuAurora.API.ViewModels.Settings;
     using DocuAurora.Data.Common.Repositories;
     using DocuAurora.Data.Models;
     using DocuAurora.Services.Data;
@@ -23,9 +22,8 @@
 
         public IActionResult Index()
         {
-            var settings = settingsService.GetAll<SettingViewModel>();
-            var model = new SettingsListViewModel { Settings = settings };
-            return View(model);
+            
+            return View();
         }
 
         public async Task<IActionResult> InsertSetting()
