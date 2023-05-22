@@ -1,7 +1,6 @@
 ﻿namespace DocuAurora.API.Areas.Administration.Controllers
 {
     using DocuAurora.Services.Data;
-    using DocuAurora.Web.ViewModels.Administration.Dashboard;
 
     using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +15,7 @@
 
         public IActionResult Index()
         {
-            var viewModel = new IndexViewModel { SettingsCount = settingsService.GetCount(), };
-            return View(viewModel);
+            return View();
         }
     }
 }

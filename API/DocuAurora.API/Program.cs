@@ -1,7 +1,7 @@
 ﻿namespace DocuAurora.API
 {
     using System.Reflection;
-    using DocuAurora.API.ViewModels;
+    using DocuAurora.API;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -76,7 +76,7 @@
                 new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
 
-            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+            //AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
 
             if (app.Environment.IsDevelopment())
             {
