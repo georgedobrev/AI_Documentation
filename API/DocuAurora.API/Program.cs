@@ -1,5 +1,6 @@
 ﻿namespace DocuAurora.API
 {
+    using System;
     using System.Reflection;
     using DocuAurora.API;
     using DocuAurora.Data;
@@ -38,6 +39,13 @@
 
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = new TimeSpan(1, 0, 0, 0);
+            });
 
             services.Configure<CookiePolicyOptions>(
                 options =>
