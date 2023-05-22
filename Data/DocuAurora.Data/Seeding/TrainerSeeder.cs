@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DocuAurora.Data.Seeding
 {
-    public class AdminSeeder : ISeeder
+    public class TrainerSeeder : ISeeder
     {
         public async Task SeedAsync(ApplicationDbContext dbContext, IServiceProvider serviceProvider)
         {
@@ -18,15 +18,15 @@ namespace DocuAurora.Data.Seeding
 
             var user = new ApplicationUser
             {
-                UserName = GlobalConstants.AdministratorUserName,
-                Email = GlobalConstants.AdministratorEmail,
+                UserName = GlobalConstants.TrainerUserName,
+                Email = GlobalConstants.TrainerEmail,
             };
 
-            var result = await userManager.CreateAsync(user, GlobalConstants.AdministratorPassword);
+            var result = await userManager.CreateAsync(user, GlobalConstants.TrainerPassword);
 
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(user, GlobalConstants.AdministratorRoleName);
+                await userManager.AddToRoleAsync(user, GlobalConstants.TrainerRoleName);
             }
         }
     }

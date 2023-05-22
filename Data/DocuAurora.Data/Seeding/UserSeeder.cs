@@ -18,7 +18,7 @@ namespace DocuAurora.Data.Seeding
 
             var user = new ApplicationUser
             {
-                UserName = GlobalConstants.UserEmail,
+                UserName = GlobalConstants.UserUserName,
                 Email = GlobalConstants.UserEmail,
             };
 
