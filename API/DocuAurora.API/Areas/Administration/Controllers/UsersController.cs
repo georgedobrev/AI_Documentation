@@ -25,6 +25,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // GET: api/values
         [HttpGet]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get()
         {
 
@@ -45,9 +48,13 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get(string id)
         {
-            //TO DO -> create viewModel if needed
+            //TO DO -> create viewModel
             var user = await this._userManager.FindByIdAsync(id);
 
             if (user == null)
