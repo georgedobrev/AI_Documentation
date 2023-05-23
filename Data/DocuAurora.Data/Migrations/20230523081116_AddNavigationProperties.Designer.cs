@@ -4,6 +4,7 @@ using DocuAurora.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocuAurora.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230523081116_AddNavigationProperties")]
+    partial class AddNavigationProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,6 +73,9 @@ namespace DocuAurora.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("ApplicationRoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -128,6 +134,8 @@ namespace DocuAurora.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationRoleId");
 
                     b.HasIndex("IsDeleted");
 
@@ -281,6 +289,13 @@ namespace DocuAurora.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DocuAurora.Data.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("DocuAurora.Data.Models.ApplicationRole", null)
+                        .WithMany("Users")
+                        .HasForeignKey("ApplicationRoleId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("DocuAurora.Data.Models.ApplicationRole", null)
@@ -330,6 +345,11 @@ namespace DocuAurora.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DocuAurora.Data.Models.ApplicationRole", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("DocuAurora.Data.Models.ApplicationUser", b =>
