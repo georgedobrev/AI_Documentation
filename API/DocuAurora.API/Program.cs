@@ -1,7 +1,8 @@
 ﻿namespace DocuAurora.API
 {
+    using System;
     using System.Reflection;
-    using DocuAurora.API.ViewModels;
+    using DocuAurora.API;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -38,6 +39,13 @@
 
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = new TimeSpan(1, 0, 0, 0);
+            });
 
             services.Configure<CookiePolicyOptions>(
                 options =>
@@ -76,7 +84,7 @@
                 new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
 
-            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+            //AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
 
             if (app.Environment.IsDevelopment())
             {
