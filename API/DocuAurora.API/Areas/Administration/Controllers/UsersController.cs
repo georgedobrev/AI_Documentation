@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DocuAurora.API.ViewModels.Administration.Users;
 using DocuAurora.Data.Models;
+using DocuAurora.Services.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,12 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAdminService _adminService;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, IAdminService adminService)
         {
             this._userManager = userManager;
+            this._adminService = adminService;
         }
 
 
@@ -30,20 +33,14 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Get()
         {
+            var users = await this._adminService.GetAllUsersAsync();
 
-            return Ok(await this._userManager.Users
-                                          .Select( x => new UserViewModel()
-                                          {
-                                              Id = x.Id,
-                                              UserName = x.UserName,
-                                              Email = x.Email,
-                                         //     Roles = x.Roles.Select(r => new UserRoleViewModel()
-                                         //     {
-                                         //         RoleId = r.RoleId,
-                                         //         UserId = r.UserId,
-                                         //    }).ToList(),
-                                          })
-                                          .ToListAsync());
+            if(!users.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(users);
         }
 
         // GET api/values/5
@@ -67,13 +64,13 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody] string value)
         {
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
         }
 
