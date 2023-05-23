@@ -25,29 +25,37 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // GET: api/values
         [HttpGet]
-        public async Task<IEnumerable<UserViewModel>> Get()
+        public async Task<IActionResult> Get()
         {
 
-            return await this._userManager.Users
+            return Ok(await this._userManager.Users
                                           .Select( x => new UserViewModel()
                                           {
                                               Id = x.Id,
                                               UserName = x.UserName,
                                               Email = x.Email,
-                                              Roles = x.Roles.Select(r => new UserRoleViewModel()
-                                              {
-                                                  RoleId = r.RoleId,
-                                                  UserId = r.UserId,
-                                              }).ToList(),
+                                         //     Roles = x.Roles.Select(r => new UserRoleViewModel()
+                                         //     {
+                                         //         RoleId = r.RoleId,
+                                         //         UserId = r.UserId,
+                                         //    }).ToList(),
                                           })
-                                          .ToListAsync();
+                                          .ToListAsync());
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            //TO DO -> create viewModel if needed
+            var user = await this._userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
         // POST api/values

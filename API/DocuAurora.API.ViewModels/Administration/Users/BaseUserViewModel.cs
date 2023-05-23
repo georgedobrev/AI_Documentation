@@ -6,10 +6,10 @@ namespace DocuAurora.API.ViewModels.Administration.Users
 {
 	public abstract class BaseUserViewModel
 	{
-		protected BaseUserViewModel()
-        {
-            this.Roles = new HashSet<UserRoleViewModel>();
-        }
+		//protected BaseUserViewModel()
+       // {
+       //     this.Roles = new HashSet<UserRoleViewModel>();
+       // }
 
 		public string Id { get; set; }
 
@@ -17,7 +17,7 @@ namespace DocuAurora.API.ViewModels.Administration.Users
 
 		public string Email { get; set; }
 
-		public virtual ICollection<UserRoleViewModel> Roles { get; set; }
+		//public virtual ICollection<UserRoleViewModel> Roles { get; set; }
 
     }
 }
