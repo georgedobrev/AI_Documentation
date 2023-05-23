@@ -81,6 +81,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         }
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
         {
             var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
