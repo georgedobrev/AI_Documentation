@@ -54,13 +54,15 @@
                     options.MinimumSameSitePolicy = SameSiteMode.None;
                 });
 
-            services.AddControllersWithViews(
-                options =>
-                {
-                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-                }).AddRazorRuntimeCompilation();
+            //services.AddControllersWithViews(
+            //    options =>
+            //    {
+            //        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            //    }).AddRazorRuntimeCompilation();
             services.AddRazorPages();
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddSingleton(configuration);
 
@@ -109,6 +111,8 @@
 
             app.MapControllerRoute("areaRoute", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            
+
             app.MapRazorPages();
         }
     }
