@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using DocuAurora.API.ViewModels.Administration.Users;
@@ -19,7 +20,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAdminService _adminService;
 
-        public UsersController(UserManager<ApplicationUser> userManager, IAdminService adminService)
+
+        public UsersController(UserManager<ApplicationUser> userManager, 
+                                            IAdminService adminService  )
         {
             this._userManager = userManager;
             this._adminService = adminService;
@@ -70,8 +73,35 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put()
         {
+            return Ok();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
+        {
+            var user =await this._userManager.Users.Include(x => x.Roles).FirstOrDefaultAsync( x=>x.Id == id);
+
+            
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Remove existing roles
+            var existingRoles = await this._userManager.GetRolesAsync(user);
+
+            //TO DO to make check if role is assined 
+
+            // Add new roles
+            var result = await this._userManager.AddToRolesAsync(user, roles);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(user);
         }
 
         // DELETE api/values/5
