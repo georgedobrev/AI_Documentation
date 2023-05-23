@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DocuAurora.API.ViewModels.Administration.Users;
 using DocuAurora.Data.Models;
+using DocuAurora.Services.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,49 +17,60 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAdminService _adminService;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, IAdminService adminService)
         {
             this._userManager = userManager;
+            this._adminService = adminService;
         }
 
 
         // GET: api/values
         [HttpGet]
-        public async Task<IEnumerable<UserViewModel>> Get()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get()
         {
+            var users = await this._adminService.GetAllUsersAsync();
 
-            return await this._userManager.Users
-                                          .Select( x => new UserViewModel()
-                                          {
-                                              Id = x.Id,
-                                              UserName = x.UserName,
-                                              Email = x.Email,
-                                              Roles = x.Roles.Select(r => new UserRoleViewModel()
-                                              {
-                                                  RoleId = r.RoleId,
-                                                  UserId = r.UserId,
-                                              }).ToList(),
-                                          })
-                                          .ToListAsync();
+            if(!users.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(users);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            //TO DO -> create viewModel
+            var user = await this._userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody] string value)
         {
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
         }
 

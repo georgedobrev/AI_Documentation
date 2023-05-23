@@ -72,6 +72,7 @@
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<IAdminService, AdminService>();
         }
 
         private static void Configure(WebApplication app)
