@@ -19,13 +19,15 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAdminService _adminService;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
-
-        public UsersController(UserManager<ApplicationUser> userManager, 
-                                            IAdminService adminService  )
+        public UsersController(UserManager<ApplicationUser> userManager,
+                                            IAdminService adminService,
+                                            RoleManager<ApplicationRole> roleManager)
         {
             this._userManager = userManager;
             this._adminService = adminService;
+            this._roleManager = roleManager;
         }
 
 
@@ -38,7 +40,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         {
             var users = await this._adminService.GetAllUsersAsync();
 
-            if(!users.Any())
+            if (!users.Any())
             {
                 return NotFound();
             }
@@ -81,21 +83,33 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
         {
-            var user =await this._userManager.Users.Include(x => x.Roles).FirstOrDefaultAsync( x=>x.Id == id);
+            var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
 
-            
+            List<string> commonRoles = dbRoles.Intersect(roles).ToList();
+
+            if (commonRoles.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var user = await this._userManager.Users.Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == id);
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Remove existing roles
             var existingRoles = await this._userManager.GetRolesAsync(user);
 
-            //TO DO to make check if role is assined 
+            var checkDublicates = roles.Except(existingRoles);
+
+            if (!checkDublicates.Any())
+            {
+                return BadRequest();
+            }
 
             // Add new roles
-            var result = await this._userManager.AddToRolesAsync(user, roles);
+            var result = await this._userManager.AddToRolesAsync(user, checkDublicates);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
