@@ -17,6 +17,7 @@ namespace DocuAurora.API.ViewModels.Administration.Users
 
 		public string Email { get; set; }
 
+
 		public virtual ICollection<UserRoleViewModel> Roles { get; set; }
 
     }
