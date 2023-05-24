@@ -19,16 +19,13 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAdminService _adminService;
-        private readonly RoleManager<ApplicationRole> _roleManager;
 
         public UsersController(
                                             UserManager<ApplicationUser> userManager,
-                                            IAdminService adminService,
-                                            RoleManager<ApplicationRole> roleManager)
+                                            IAdminService adminService)
         {
             this._userManager = userManager;
             this._adminService = adminService;
-            this._roleManager = roleManager;
         }
 
         // GET: api/users
