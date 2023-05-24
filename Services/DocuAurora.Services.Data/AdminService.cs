@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,10 +15,31 @@ namespace DocuAurora.Services.Data
     public class AdminService : IAdminService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
-        public AdminService(UserManager<ApplicationUser> userManager)
+        public AdminService(UserManager<ApplicationUser> userManager,
+                            RoleManager<ApplicationRole> roleManager)
         {
             this._userManager = userManager;
+            this._roleManager = roleManager;
+        }
+
+        public async Task<IEnumerable<string>> FilterRolesThatAreNotAlreadySetAsync(IEnumerable<string> roles, ApplicationUser user)
+        {
+            var existingRoles = await this._userManager.GetRolesAsync(user);
+
+            var checkUnique = roles.Except(existingRoles);
+
+            return checkUnique;
+        }
+
+        public async Task<IEnumerable<string>> FilterRolesThatExistsAsync(IEnumerable<string> roles)
+        {
+            var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
+
+            var filteredRoleList = dbRoles.Where(roles.Contains).ToList();
+
+            return filteredRoleList;
         }
 
         public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()

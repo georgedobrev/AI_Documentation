@@ -85,12 +85,10 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
-        {
-            var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
+        { 
+            var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
 
-            var filteredList = dbRoles.Where(roles.Contains).ToList();
-
-            if (filteredList.Count == 0)
+            if (!filteredRoleList.Any())
             {
                 return BadRequest();
             }
@@ -104,15 +102,16 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
             var existingRoles = await this._userManager.GetRolesAsync(user);
 
-            var checkDublicates = roles.Except(existingRoles);
+            var checkUnique = await this._adminService.FilterRolesThatAreNotAlreadySetAsync(filteredRoleList, user);
 
-            if (!checkDublicates.Any())
+            if (!checkUnique.Any())
             {
                 return BadRequest();
             }
 
             // Add new roles
-            var result = await this._userManager.AddToRolesAsync(user, checkDublicates);
+            var result = await this._userManager.AddToRolesAsync(user, checkUnique);
+
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
