@@ -54,9 +54,13 @@
                     options.MinimumSameSitePolicy = SameSiteMode.None;
                 });
 
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
             services.AddRazorPages();
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddSingleton(configuration);
 
@@ -68,6 +72,7 @@
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<IAdminService, AdminService>();
         }
 
         private static void Configure(WebApplication app)
@@ -104,6 +109,8 @@
 
             app.MapControllerRoute("areaRoute", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            
+
             app.MapRazorPages();
         }
     }

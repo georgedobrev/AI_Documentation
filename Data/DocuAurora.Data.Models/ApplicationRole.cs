@@ -28,5 +28,7 @@ namespace DocuAurora.Data.Models
 
         public DateTime? DeletedOn { get; set; }
 
+        public virtual ICollection<ApplicationUser> Users { get; set; }
+
     }
 }

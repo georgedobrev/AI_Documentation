@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\API\DocuAurora.API.ViewModels\DocuAurora.API.ViewModels.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Common\DocuAurora.Data.Common.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Models\DocuAurora.Data.Models.csproj" />
     <ProjectReference Include="..\DocuAurora.Services.Mapping\DocuAurora.Services.Mapping.csproj" />

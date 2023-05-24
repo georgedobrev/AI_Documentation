@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using DocuAurora.API.ViewModels.Administration.Users;
 using DocuAurora.Data.Models;
+using DocuAurora.Services.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,60 +14,141 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DocuAurora.API.Areas.Administration.Controllers
 {
+    //TO DO -> ONLY ADMIN TO HAVE ACCESS
+
     [Route("api/[controller]")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAdminService _adminService;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(
+                                            UserManager<ApplicationUser> userManager,
+                                            IAdminService adminService)
         {
             this._userManager = userManager;
+            this._adminService = adminService;
         }
 
-
-        // GET: api/values
+        // GET: api/users
         [HttpGet]
-        public async Task<IEnumerable<UserViewModel>> Get()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get()
         {
+            var users = await this._adminService.GetAllUsersAsync();
 
-            return await this._userManager.Users
-                                          .Select( x => new UserViewModel()
-                                          {
-                                              Id = x.Id,
-                                              UserName = x.UserName,
-                                              Email = x.Email,
-                                              Roles = x.Roles.Select(r => new UserRoleViewModel()
-                                              {
-                                                  RoleId = r.RoleId,
-                                                  UserId = r.UserId,
-                                              }).ToList(),
-                                          })
-                                          .ToListAsync();
+            if (!users.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(users);
         }
 
-        // GET api/values/5
+        // GET api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpGet("{id}")]
-        public string Get(int id)
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            var user = await this._adminService.GetUserAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
+        // Patch api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
+        [HttpPatch("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
+        { 
+            var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
+
+            if (!filteredRoleList.Any())
+            {
+                return BadRequest();
+            }
+
+            var user = await this._userManager.Users.Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var existingRoles = await this._userManager.GetRolesAsync(user);
+
+            var checkUnique = await this._adminService.FilterRolesThatAreNotAlreadySetAsync(filteredRoleList, user);
+
+            if (!checkUnique.Any())
+            {
+                return BadRequest();
+            }
+
+            // Add new roles
+            var result = await this._userManager.AddToRolesAsync(user, checkUnique);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var userViewModel = await this._adminService.GetUserAsync(id);
+
+            return Ok(userViewModel);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
+        // DELETE api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Delete(string id, [FromBody] List<string> roles)
         {
+            var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
+
+            if (!filteredRoleList.Any())
+            {
+                return BadRequest();
+            }
+
+            var user = await this._userManager.Users.Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var existingRoles = await this._userManager.GetRolesAsync(user);
+
+            var rolesToRemove = filteredRoleList.Intersect(existingRoles);
+
+            if (!rolesToRemove.Any())
+            {
+                return NotFound();
+            }
+
+            var result = await this._userManager.RemoveFromRolesAsync(user, rolesToRemove);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var userViewModel = await this._adminService.GetUserAsync(id);
+
+            return Ok(userViewModel);
+
         }
     }
 }
