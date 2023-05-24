@@ -111,6 +111,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // DELETE api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpDelete("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(string id, [FromBody] List<string> roles)
         {
             var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
