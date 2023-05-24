@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DocuAurora.API.Areas.Administration.Controllers
 {
+    //TO DO -> ONLY ADMIN TO HAVE ACCESS
+
     [Route("api/[controller]")]
     public class UsersController : Controller
     {
