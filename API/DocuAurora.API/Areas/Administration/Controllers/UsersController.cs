@@ -31,7 +31,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             this._roleManager = roleManager;
         }
 
-        // GET: api/values
+        // GET: api/users
         [HttpGet]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
@@ -48,7 +48,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return Ok(users);
         }
 
-        // GET api/values/5
+        // GET api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpGet("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
@@ -56,7 +56,6 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Get(string id)
         {
-            //TO DO -> create viewModel
             var user = await this._adminService.GetUserAsync(id);
 
             if (user == null)
@@ -67,12 +66,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return Ok(user);
         }
 
-        //// POST api/values
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
+        // Patch api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpPatch("{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
@@ -115,7 +109,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return Ok(userViewModel);
         }
 
-        // DELETE api/values/5
+        // DELETE api/users/bc719f0c-ad53-4d35-8bc4-b511dd94dc07
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id, [FromBody] List<string> roles)
         {
