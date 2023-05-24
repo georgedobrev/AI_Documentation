@@ -20,12 +20,23 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Serilog;
 
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add services to the container.
+            var logger = new LoggerConfiguration()
+              .ReadFrom.Configuration(builder.Configuration)
+              .Enrich.FromLogContext()
+              .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
+
             ConfigureServices(builder.Services, builder.Configuration);
             var app = builder.Build();
             Configure(app);
