@@ -88,9 +88,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         {
             var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
 
-            List<string> commonRoles = dbRoles.Intersect(roles).ToList();
+            var filteredList = dbRoles.Where(roles.Contains).ToList();
 
-            if (commonRoles.Count == 0)
+            if (filteredList.Count == 0)
             {
                 return BadRequest();
             }
