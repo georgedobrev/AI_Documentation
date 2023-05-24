@@ -17,7 +17,8 @@ namespace DocuAurora.Services.Data
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
 
-        public AdminService(UserManager<ApplicationUser> userManager,
+        public AdminService(
+                            UserManager<ApplicationUser> userManager,
                             RoleManager<ApplicationRole> roleManager)
         {
             this._userManager = userManager;
@@ -35,7 +36,9 @@ namespace DocuAurora.Services.Data
 
         public async Task<IEnumerable<string>> FilterRolesThatExistsAsync(IEnumerable<string> roles)
         {
-            var dbRoles = await this._roleManager.Roles.Select(x => x.Name).ToListAsync();
+            var dbRoles = await this._roleManager.Roles
+                                                 .Select(x => x.Name)
+                                                 .ToListAsync();
 
             var filteredRoleList = dbRoles.Where(roles.Contains).ToList();
 
@@ -44,7 +47,9 @@ namespace DocuAurora.Services.Data
 
         public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
         {
-            var users = await this._userManager.Users.Include(x => x.Roles).ToListAsync();
+            var users = await this._userManager.Users
+                                               .Include(x => x.Roles)
+                                               .ToListAsync();
 
             var userViewModels = new List<UserViewModel>();
 
@@ -71,5 +76,28 @@ namespace DocuAurora.Services.Data
             return userViewModels;
         }
 
+        public async Task<UserViewModel> GetUserAsync(string id)
+        {
+            var user = await this._userManager.Users
+                                              .Include(x => x.Roles)
+                                              .FirstOrDefaultAsync(x => x.Id == id);
+
+            var roles = await this._userManager.GetRolesAsync(user);
+
+            var userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Roles = roles.Select(role => new UserRoleViewModel()
+                {
+                    Name = role,
+                    RoleId = user.Roles.Select(x => x.RoleId).FirstOrDefault(),
+                    UserId = user.Roles.Select(r => r.UserId).FirstOrDefault(),
+                }).ToList(),
+            };
+
+            return userViewModel;
+        }
     }
 }

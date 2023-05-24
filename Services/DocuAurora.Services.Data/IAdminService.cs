@@ -12,6 +12,8 @@ namespace DocuAurora.Services.Data
     {
         Task<IEnumerable<UserViewModel>> GetAllUsersAsync();
 
+        Task<UserViewModel> GetUserAsync(string id);
+
         Task<IEnumerable<string>> FilterRolesThatExistsAsync(IEnumerable<string> roles);
 
         Task<IEnumerable<string>> FilterRolesThatAreNotAlreadySetAsync(IEnumerable<string> roles, ApplicationUser user);
