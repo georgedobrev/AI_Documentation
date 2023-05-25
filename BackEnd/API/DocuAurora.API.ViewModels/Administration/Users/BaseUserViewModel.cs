@@ -1,5 +1,7 @@
 ﻿using System;
+
 using Microsoft.AspNetCore.Identity;
+
 using System.Collections.Generic;
 
 namespace DocuAurora.API.ViewModels.Administration.Users

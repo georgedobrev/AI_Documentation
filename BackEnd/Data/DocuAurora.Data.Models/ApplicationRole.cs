@@ -3,6 +3,7 @@ namespace DocuAurora.Data.Models
 {
     using System;
     using System.Collections.Generic;
+
     using DocuAurora.Data.Common.Models;
 
     using Microsoft.AspNetCore.Identity;

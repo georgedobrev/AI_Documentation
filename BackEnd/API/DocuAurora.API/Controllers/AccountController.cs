@@ -3,17 +3,24 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using System.Threading.Tasks;
+
 using DocuAurora.API.ViewModels;
 using DocuAurora.Data.Models;
 using DocuAurora.API.ViewModels.Administration.Users;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System;
+
 using Microsoft.IdentityModel.Tokens;
+
 using System.Text;
+
 using Microsoft.Extensions.Configuration;
+
 using System.Configuration;
 
 namespace DocuAurora.API.Controllers
