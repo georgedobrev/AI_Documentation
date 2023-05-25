@@ -70,7 +70,6 @@
                     options.MinimumSameSitePolicy = SameSiteMode.None;
                 });
 
-
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             services.AddRazorPages();
@@ -81,6 +80,8 @@
             services.AddSingleton(configuration);
 
             // MongoDB
+            services.Configure<DocumentStoreDatabaseSettings>(
+    configuration.GetSection(nameof(DocumentStoreDatabaseSettings)));
             services.AddSingleton<IDocumentStoreDatabaseSettings>(sp =>
              sp.GetRequiredService<IOptions<DocumentStoreDatabaseSettings>>().Value);
             services.AddSingleton<IMongoClient>(s =>
@@ -90,6 +91,7 @@
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IDbQueryRunner, DbQueryRunner>();
+            services.AddScoped<IDocumentService, DocumentService>();
 
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
