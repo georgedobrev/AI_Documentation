@@ -8,6 +8,7 @@
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
     using DocuAurora.Data.Models;
+    using DocuAurora.Data.Models.MongoDB;
     using DocuAurora.Data.Repositories;
     using DocuAurora.Data.Seeding;
     using DocuAurora.Services.Data;
@@ -22,7 +23,9 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
+    using MongoDB.Driver;
     using Serilog;
 
     public class Program
@@ -76,6 +79,12 @@
             services.AddControllers().AddNewtonsoftJson();
 
             services.AddSingleton(configuration);
+
+            // MongoDB
+            services.AddSingleton<IDocumentStoreDatabaseSettings>(sp =>
+             sp.GetRequiredService<IOptions<DocumentStoreDatabaseSettings>>().Value);
+            services.AddSingleton<IMongoClient>(s =>
+        new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
 
             // Data repositories
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
@@ -134,7 +143,7 @@
 
             app.MapControllerRoute("areaRoute", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
-            
+
 
             app.MapRazorPages();
         }
