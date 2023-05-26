@@ -1,11 +1,16 @@
-﻿namespace DocuAurora.API.ViewModels.Administration.Users
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DocuAurora.API.ViewModels.Administration.Users
 {
     public class LoginUserViewModel
     {
+       
         public string  id { get; set; }
 
-        public string UserName { get; set; }
+        [Required]
+        public string Username { get; set; }
 
+        [Required]
         public string Password { get; set; }
 
         public string Email { get; set; }
