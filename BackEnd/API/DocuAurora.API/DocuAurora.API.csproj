@@ -46,9 +46,4 @@
     <ProjectReference Include="..\DocuAurora.API.Infrastructure\DocuAurora.API.Infrastructure.csproj" />
     <ProjectReference Include="..\DocuAurora.API.ViewModels\DocuAurora.API.ViewModels.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Areas\Administration\Controllers\" />
-    <Folder Include="Controllers\" />
-  </ItemGroup>
 </Project>
