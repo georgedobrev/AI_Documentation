@@ -4,6 +4,7 @@
     using System.Reflection;
 
     using DocuAurora.API;
+    using DocuAurora.API.Infrastructure;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -46,6 +47,9 @@
             var app = builder.Build();
             Configure(app);
             app.Run();
+
+            Log.CloseAndFlush();
+
         }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
@@ -134,6 +138,8 @@
             app.UseRouting();
 
             app.UseAuthentication();
+            // SERILOG USARNAME INSERTION
+            app.UseMiddleware<LogUserNameMiddleware>();
             app.UseAuthorization();
 
             app.UseSwagger();
