@@ -372,3 +372,4 @@ Migrations/
 
 # Removing appSetings
 appsettings.json
+appsettings.Development
