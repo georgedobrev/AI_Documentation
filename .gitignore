@@ -366,3 +366,9 @@ FodyWeavers.xsd
 **/.idea
 **/out
 **/target
+
+# Removing Migration folder
+Migrations/
+
+# Removing appSetings
+appsettings.json
