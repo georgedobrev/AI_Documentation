@@ -102,7 +102,6 @@
 
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
-            services.AddTransient<ISettingsService, SettingsService>();
             services.AddTransient<IAdminService, AdminService>();
 
             services.AddSwaggerGen(c =>
