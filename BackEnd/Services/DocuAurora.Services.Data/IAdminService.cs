@@ -11,7 +11,7 @@ namespace DocuAurora.Services.Data
 {
     public interface IAdminService
     {
-        Task<IEnumerable<UserViewModel>> GetAllUsersAsync();
+        Task<IEnumerable<T>> GetAllUsersAsync<T>();
 
         Task<UserViewModel> GetUserAsync(string id);
 

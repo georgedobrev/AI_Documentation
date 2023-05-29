@@ -5,6 +5,7 @@
 
     using DocuAurora.API;
     using DocuAurora.API.Infrastructure;
+    using DocuAurora.API.ViewModels.Administration.Users;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -35,7 +36,7 @@
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
+            AutoMapperConfig.RegisterMappings(typeof(UserViewModel).Assembly, typeof(ApplicationUser).Assembly);
 
             ConfigureServices(builder.Services, builder.Configuration);
 

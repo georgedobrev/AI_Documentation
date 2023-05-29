@@ -38,7 +38,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Get()
         {
-            var users = await this._adminService.GetAllUsersAsync();
+            var users = await this._adminService.GetAllUsersAsync<UserViewModel>();
 
             if (!users.Any())
             {
@@ -72,7 +72,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
-        { 
+        {
             var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
 
             if (!filteredRoleList.Any())
