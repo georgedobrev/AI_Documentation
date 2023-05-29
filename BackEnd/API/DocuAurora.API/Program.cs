@@ -2,7 +2,7 @@
 {
     using System;
     using System.Reflection;
-
+    using System.Text;
     using DocuAurora.API;
     using DocuAurora.API.Infrastructure;
     using DocuAurora.Data;
@@ -15,7 +15,7 @@
     using DocuAurora.Services.Data;
     using DocuAurora.Services.Mapping;
     using DocuAurora.Services.Messaging;
-
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Identity;
@@ -26,6 +26,7 @@
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
     using Microsoft.OpenApi.Models;
     using MongoDB.Driver;
     using Serilog;
@@ -35,7 +36,7 @@
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            ConfigurationManager configuration = builder.Configuration;
 
 
             ConfigureServices(builder.Services, builder.Configuration);
@@ -48,12 +49,35 @@
             builder.Logging.ClearProviders();
             builder.Logging.AddSerilog(logger);
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]))
+                };
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+            });
+
             var app = builder.Build();
             Configure(app);
             app.Run();
 
             Log.CloseAndFlush();
-
+            
         }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
@@ -112,11 +136,7 @@
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
 
-            services.AddAuthentication().AddGoogle(googleOptions =>
-            {
-                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-            });
+            services.AddAuthentication();
         }
 
         private static void Configure(WebApplication app)
