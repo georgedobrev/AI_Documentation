@@ -85,7 +85,7 @@ namespace DocuAurora.API.Controllers
    
 
         [HttpPost("logout")]
-        [Authorize]
+        
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
