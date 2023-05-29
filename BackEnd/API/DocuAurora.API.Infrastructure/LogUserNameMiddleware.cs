@@ -20,7 +20,7 @@ namespace DocuAurora.API.Infrastructure
 
         public Task Invoke(HttpContext context)
         {
-            LogContext.PushProperty("UserName", context.User.Identity.Name == null ? "Milcho E Admin" : context.User.Identity.Name);
+            LogContext.PushProperty("UserName", context.User.Identity.Name == null ? "Anonymous" : context.User.Identity.Name);
 
             return next(context);
         }
