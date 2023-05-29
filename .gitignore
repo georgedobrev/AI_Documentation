@@ -366,3 +366,6 @@ FodyWeavers.xsd
 **/.idea
 **/out
 **/target
+
+# Removing appSetings
+appsettings.Development
