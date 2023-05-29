@@ -49,11 +49,18 @@ namespace DocuAurora.Services.Data
         public async Task<IEnumerable<T>> GetAllUsersAsync<T>()
         {
 
-            IQueryable<ApplicationUser> query = this._userManager.Users.Include(x => x.Roles);
-    
+            IQueryable<ApplicationUser> queryUsers = this._userManager.Users.Include(x => x.Roles);
+            IQueryable<ApplicationRole> queryRoles = this._roleManager.Roles;
+
+            var joinedQuery = queryUsers.Join(
+    queryRoles,
+    user => user.Roles.FirstOrDefault().RoleId,
+    role => role.Id,
+    (user, role) => new { User = user, Role = role }
+);
 
 
-            return query.To<T>().ToList();
+            return joinedQuery.To<T>().ToList();
 
 
 
