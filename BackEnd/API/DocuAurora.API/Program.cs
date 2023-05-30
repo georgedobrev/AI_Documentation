@@ -1,6 +1,7 @@
 ﻿namespace DocuAurora.API
 {
     using System;
+    using System.IO;
     using System.Reflection;
     using System.Text;
     using DocuAurora.API;
@@ -38,8 +39,7 @@
             var builder = WebApplication.CreateBuilder(args);
             ConfigurationManager configuration = builder.Configuration;
 
-
-            ConfigureServices(builder.Services, builder.Configuration);
+        ConfigureServices(builder.Services, builder.Configuration);
 
             // Add services to the container.
             var logger = new LoggerConfiguration()
