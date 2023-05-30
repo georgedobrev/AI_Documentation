@@ -26,4 +26,10 @@
     <ProjectReference Include="..\DocuAurora.Services.Mapping\DocuAurora.Services.Mapping.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Contracts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Contracts\" />
+  </ItemGroup>
 </Project>
