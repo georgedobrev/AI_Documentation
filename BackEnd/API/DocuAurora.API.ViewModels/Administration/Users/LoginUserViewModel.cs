@@ -5,7 +5,7 @@ namespace DocuAurora.API.ViewModels.Administration.Users
     public class LoginUserViewModel
     {
        
-        public string  id { get; set; }
+        private string  id { get; set; }
 
         [Required]
         public string Username { get; set; }

@@ -107,5 +107,46 @@ namespace DocuAurora.API.Controllers
 
             return token;
         }
+
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                // Don't reveal that the user does not exist or is not confirmed
+                return Ok();
+
+            // For more information on how to enable account confirmation and password reset please 
+            // visit https://go.microsoft.com/fwlink/?LinkID=532713
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+            // Email the user the callback link here. You'll need to setup an email service for this.
+            // await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+            //    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+
+            return Ok();
+        }
+
+        [HttpPost("resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                // Don't reveal that the user does not exist
+                return BadRequest();
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            if (!result.Succeeded)
+                return BadRequest();
+
+            return Ok();
+        }
     }
 }
