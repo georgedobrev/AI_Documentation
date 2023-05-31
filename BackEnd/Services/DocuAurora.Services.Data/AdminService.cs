@@ -1,6 +1,8 @@
 ﻿using DocuAurora.API.ViewModels.Administration.Users;
+using DocuAurora.Data;
 using DocuAurora.Data.Models;
 using DocuAurora.Services.Mapping;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,13 +19,16 @@ namespace DocuAurora.Services.Data
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly ApplicationDbContext _dbContext;
 
         public AdminService(
                             UserManager<ApplicationUser> userManager,
-                            RoleManager<ApplicationRole> roleManager)
+                            RoleManager<ApplicationRole> roleManager,
+                            ApplicationDbContext dbContext)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
+            this._dbContext = dbContext;
         }
 
         public async Task<IEnumerable<string>> FilterRolesThatAreNotAlreadySetAsync(IEnumerable<string> roles, ApplicationUser user)
@@ -49,50 +54,33 @@ namespace DocuAurora.Services.Data
         public async Task<IEnumerable<T>> GetAllUsersAsync<T>()
         {
 
-            IQueryable<ApplicationUser> queryUsers = this._userManager.Users.Include(x => x.Roles);
-            IQueryable<ApplicationRole> queryRoles = this._roleManager.Roles;
+            var users = await this._userManager.Users
+                                               .Include(x => x.Roles)
+                                               .ToListAsync();
 
-            var joinedQuery = queryUsers.Join(
-    queryRoles,
-    user => user.Roles.FirstOrDefault().RoleId,
-    role => role.Id,
-    (user, role) => new { User = user, Role = role }
-);
+            var userViewModels = new List<UserViewModel>();
 
+            foreach (var user in users)
+            {
+                var roles = await this._userManager.GetRolesAsync(user);
 
-            return joinedQuery.To<T>().ToList();
+                var userViewModel = new UserViewModel()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Roles = roles.Select(role => new UserRoleViewModel()
+                    {
+                        Name = role,
+                        RoleId = user.Roles.Select(x => x.RoleId).FirstOrDefault(),
+                        UserId = user.Roles.Select(r => r.UserId).FirstOrDefault(),
+                    }).ToList(),
+                };
 
+                userViewModels.Add(userViewModel);
+            }
 
-
-
-
-            //var users = await this._userManager.Users
-            //                                   .Include(x => x.Roles)
-            //                                   .ToListAsync();
-
-            //var userViewModels = new List<UserViewModel>();
-
-            //foreach (var user in users)
-            //{
-            //    var roles = await this._userManager.GetRolesAsync(user);
-
-            //    var userViewModel = new UserViewModel()
-            //    {
-            //        Id = user.Id,
-            //        UserName = user.UserName,
-            //        Email = user.Email,
-            //        Roles = roles.Select(role => new UserRoleViewModel()
-            //        {
-            //            Name = role,
-            //            RoleId = user.Roles.Select(x => x.RoleId).FirstOrDefault(),
-            //            UserId = user.Roles.Select(r => r.UserId).FirstOrDefault(),
-            //        }).ToList(),
-            //    };
-
-            //    userViewModels.Add(userViewModel);
-            //}
-
-            //return userViewModels;
+            return userViewModels;
         }
 
         public async Task<UserViewModel> GetUserAsync(string id)

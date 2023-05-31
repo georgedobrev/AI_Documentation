@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Common\DocuAurora.Data.Common.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Models\DocuAurora.Data.Models.csproj" />
     <ProjectReference Include="..\DocuAurora.Services.Mapping\DocuAurora.Services.Mapping.csproj" />
+    <ProjectReference Include="..\..\Data\DocuAurora.Data\DocuAurora.Data.csproj" />
   </ItemGroup>
 
 </Project>
