@@ -1,20 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
-using Newtonsoft.Json;
-using OpenAI_API;
-using OpenAI_API.Completions;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DocuAurora.API.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using DocuAurora.Common;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Identity.Client;
+    using Newtonsoft.Json;
+    using OpenAI_API;
+    using OpenAI_API.Completions;
+
     [Route("api/[controller]")]
-    public class ChatGPTController : Controller
+    [ApiController]
+    [Authorize(Roles = GlobalConstants.TrainerRoleName)]
+
+    public class ChatGPTController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
@@ -22,7 +29,6 @@ namespace DocuAurora.API.Controllers
         {
             this._configuration = configuration;
         }
-
 
         // GET: api/values
         [HttpGet]

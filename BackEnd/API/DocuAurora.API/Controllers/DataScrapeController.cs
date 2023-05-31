@@ -1,14 +1,20 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-
-namespace DocuAurora.API.Controllers
+﻿namespace DocuAurora.API.Controllers
 {
+    using System.Data;
+    using System.Net.Http;
+    using System.Text.Json;
+    using System.Threading.Tasks;
+
+    using DocuAurora.Common;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Net.Http.Headers;
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = GlobalConstants.TrainerRoleName)]
+
     public class DataScrapeController : ControllerBase
     {
         [HttpPost]
