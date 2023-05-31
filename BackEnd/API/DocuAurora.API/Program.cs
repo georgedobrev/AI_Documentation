@@ -6,6 +6,7 @@
     using System.Text;
     using DocuAurora.API;
     using DocuAurora.API.Infrastructure;
+    using DocuAurora.API.ViewModels.Administration.Users;
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
     using DocuAurora.Data.Common.Repositories;
@@ -37,7 +38,9 @@
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             ConfigurationManager configuration = builder.Configuration;
+
 
             ConfigureServices(builder.Services, builder.Configuration);
 
