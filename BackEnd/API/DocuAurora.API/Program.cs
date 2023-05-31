@@ -117,6 +117,7 @@
             services.AddSingleton<IMongoClient>(s =>
         new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
 
+
             // Data repositories
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -124,7 +125,8 @@
             services.AddScoped<IDocumentService, DocumentService>();
 
             // Application services
-            services.AddTransient<IEmailSender, NullMessageSender>();
+            services.AddTransient < IEmailSender > (i =>
+            new SendGridEmailSender(configuration.GetValue<string>("SendGridSettings:SendGridApiKey")));
             services.AddTransient<IAdminService, AdminService>();
 
             services.AddSwaggerGen(c =>
