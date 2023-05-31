@@ -1,19 +1,19 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import './LoginPageStyles.css';
+import '../Styles/LoginPageStyles.css';
 import logo from '../assets/DocuAuroraLogo_prev_ui.png'; 
 
 const validationSchema = Yup.object({
     username: Yup.string()
-        .min(2, 'Too Short!')
-        .max(20, 'Too Long!')
-        .required('Required'),
+        .min(2, 'Username is too short - should be 2 chars minimum.')
+        .max(20, 'Username is too long - should be 20 chars maximum.')
+        .required('Username is required.'),
     password: Yup.string()
         .min(8, 'Password is too short - should be 8 chars minimum.')
         .matches(/[A-Z]/, 'Password must contain at least one uppercase letter.')
         .matches(/\d/, 'Password must contain at least one digit.')
         .matches(/[+\-*&^]/, 'Password must contain at least one special character (+, -, *, &, ^).')
-        .required('Required'),
+        .required('Password is required.'),
 });
 
 function LoginPage() {

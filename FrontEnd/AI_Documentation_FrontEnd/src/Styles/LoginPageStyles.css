@@ -1,13 +1,16 @@
+@import './global.css';
+
+
 .App {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(to right, #f2fcfe, #1c92d2, #f2fcfe);
+    background: linear-gradient(to right, var(--main-bg-color-start), var(--main-bg-color-middle), var(--main-bg-color-end));
 }
 
-.register-form {
+.login-form {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -20,35 +23,18 @@
     transition: all 0.3s ease;
 }
 
-.register-form .logo {
+.login-form .logo {
     position: absolute;
-    top: -1px; /* Adjust as needed */
-    left: 50%; /* Center the logo */
-    transform: translateX(-50%); /* Center the logo */
+    top: -0.1px;  
+    left: 50%;  
+    transform: translateX(-50%);  
     width: 100px;
     height: auto;
 }
 
 
-
-.register-form input.error-input {
-    border-bottom: 2px solid red;
-}
-
-.register-form input.normal-input {
-    border-bottom: 2px solid #1c92d2;
-}
-
-
-.register-form .error {
-    color: red;
-    font-size: 0.8em;
-    text-align: left;
-    width: 80%;
-    margin: 0 auto 10px;
-}
- 
-.register-form h2 {
+.login-form h2 {
+    margin-top: 23px;
     margin-bottom: 30px;
     color: #333;
     font-size: 1.6em;
@@ -59,26 +45,32 @@
     letter-spacing: 0.2em;
     text-shadow: none;
     padding-bottom: 10px;
-    margin-top: 30px;
 }
- 
-.register-form input {
+
+.login-form input {
     width: 80%;
     padding: 10px;
     margin-bottom: 20px;
     border: none;
-    border-bottom: 2px solid #1c92d2;
     border-radius: 0;
     font-size: 0.9em;
     outline: none;
     transition: all 0.3s ease;
 }
- 
-.register-form input:focus {
-    border-bottom-color: #333;
+
+.login-form .normal-input {
+    border-bottom: 2px solid var(--input-border-color);
 }
- 
-.register-form button,
+
+.login-form .error-input {
+    border-bottom: 2px solid var(--input-border-color-error);
+}
+
+.login-form input:focus {
+    border-bottom-color: var(--input-border-color-focus);
+}
+
+.login-form button,
 .google-login button {
     width: 200px;
     height: 40px;
@@ -90,32 +82,39 @@
     transition: all 0.3s ease;
     border-radius: 10px;
 }
- 
-.register-form button {
-    background: #1c92d2;
+
+.login-form button {
+    background: var(--login-button-bg-color);
     color: white;
     border: none;
 }
- 
-.register-form button:hover {
-    background: #1a82b8;
+
+.login-form button:hover {
+    background: var(--login-button-hover-bg-color);
 }
- 
+
 .google-login button {
     background-color: white;
-    color: #4285f4;
-    border: 1px solid #4285f4;
+    color: var(--google-button-text-color);
+    border: 1px solid var(--google-button-border-color);
     padding: 10px 20px;
     font-size: 14px;
     overflow: hidden;
-    white-space: nowrap;
 }
- 
-.google-login button:hover {
-    background-color: #1c92d2;
-    color: white;
-}
- 
+
 .google-login img {
     margin-right: 10px;
+}
+
+.google-login button:hover {
+    background-color: var(--google-button-hover-bg-color);
+    color: var(--google-button-hover-text-color);
+}
+
+.login-form .error {
+    color: var(--error-text-color);
+    font-size: 0.8em;
+    text-align: left;
+    width: 80%;
+    margin: 0 auto 10px;
 }
