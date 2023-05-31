@@ -51,7 +51,7 @@ namespace DocuAurora.Services.Data
             return filteredRoleList;
         }
 
-        public async Task<IEnumerable<T>> GetAllUsersAsync<T>()
+        public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
         {
 
             var users = await this._userManager.Users

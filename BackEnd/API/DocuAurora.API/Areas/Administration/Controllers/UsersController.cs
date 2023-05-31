@@ -38,7 +38,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Get()
         {
-            var users = await this._adminService.GetAllUsersAsync<UserViewModel>();
+            var users = await this._adminService.GetAllUsersAsync();
 
             if (!users.Any())
             {
