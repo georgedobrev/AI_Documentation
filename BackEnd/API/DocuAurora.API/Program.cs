@@ -1,8 +1,9 @@
 ﻿namespace DocuAurora.API
 {
     using System;
+    using System.IO;
     using System.Reflection;
-
+    using System.Text;
     using DocuAurora.API;
     using DocuAurora.API.Infrastructure;
     using DocuAurora.API.ViewModels.Administration.Users;
@@ -16,9 +17,10 @@
     using DocuAurora.Services.Data;
     using DocuAurora.Services.Mapping;
     using DocuAurora.Services.Messaging;
-
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -26,6 +28,7 @@
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
     using Microsoft.OpenApi.Models;
     using MongoDB.Driver;
     using Serilog;
@@ -36,7 +39,8 @@
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            AutoMapperConfig.RegisterMappings(typeof(UserViewModel).Assembly, typeof(ApplicationUser).Assembly);
+            ConfigurationManager configuration = builder.Configuration;
+
 
             ConfigureServices(builder.Services, builder.Configuration);
 
@@ -48,12 +52,35 @@
             builder.Logging.ClearProviders();
             builder.Logging.AddSerilog(logger);
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]))
+                };
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+            });
+
             var app = builder.Build();
             Configure(app);
             app.Run();
 
             Log.CloseAndFlush();
-
+            
         }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
@@ -62,7 +89,8 @@
                 options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
-                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
             services.AddSession(options =>
@@ -78,9 +106,6 @@
                     options.MinimumSameSitePolicy = SameSiteMode.None;
                 });
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
-
-            services.AddRazorPages();
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddControllers().AddNewtonsoftJson();
@@ -109,6 +134,8 @@
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+
+            services.AddAuthentication();
         }
 
         private static void Configure(WebApplication app)
@@ -121,21 +148,7 @@
                 new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
 
-            //AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
-
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
-
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseRouting();
@@ -155,8 +168,6 @@
             app.MapControllerRoute("areaRoute", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
-
-            app.MapRazorPages();
         }
     }
 }

@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\Data\DocuAurora.Data\DocuAurora.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Contracts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Contracts\" />
+  </ItemGroup>
 </Project>

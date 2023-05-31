@@ -1,20 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
-using Newtonsoft.Json;
-using OpenAI_API;
-using OpenAI_API.Completions;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DocuAurora.API.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using DocuAurora.Common;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Identity.Client;
+    using Newtonsoft.Json;
+    using OpenAI_API;
+    using OpenAI_API.Completions;
+
     [Route("api/[controller]")]
-    public class ChatGPTController : Controller
+    [ApiController]
+    [Authorize(Roles = GlobalConstants.TrainerRoleName)]
+
+    public class ChatGPTController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
+        public ChatGPTController(IConfiguration configuration)
+        {
+            this._configuration = configuration;
+        }
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
@@ -33,7 +48,7 @@ namespace DocuAurora.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]string value)
         {
-            OpenAIAPI api = new OpenAIAPI("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");
+            OpenAIAPI api = new OpenAIAPI(this._configuration["ChatGPTAPIkey"]);
 
             var chat = api.Chat.CreateConversation();
 
@@ -44,9 +59,7 @@ namespace DocuAurora.API.Controllers
             /// give instruction as System
             chat.AppendSystemMessage("You are a writer.");
 
-            string template = "There is text with information. Write 3 summaries about this text. Output should be in JSON format with text property which will be for original text and the other property is summaries which will be consisted of array of strings from answear of chatGPT";
-
-            chat.AppendUserInput(string.Format(template, value));
+            chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplate"], value));
 
             string response = await chat.GetResponseFromChatbotAsync();
 
