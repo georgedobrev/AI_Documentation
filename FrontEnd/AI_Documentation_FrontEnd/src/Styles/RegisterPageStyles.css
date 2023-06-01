@@ -1,0 +1,119 @@
+@import './global.css';
+
+.App {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(to right, var(--main-bg-color-start), var(--main-bg-color-middle), var(--main-bg-color-end));
+}
+
+.register-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.register-form .logo {
+    position: absolute;
+    top: -1px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 100px;
+    height: auto;
+}
+
+.register-form input.error-input {
+    border-bottom: 2px solid var(--input-border-color-error);
+}
+
+.register-form input.normal-input {
+    border-bottom: 2px solid var(--input-border-color);
+}
+
+.register-form .error {
+    color: var(--error-text-color);
+    font-size: 0.8em;
+    text-align: left;
+    width: 80%;
+    margin: 0 auto 10px;
+}
+ 
+.register-form h2 {
+    margin-bottom: 30px;
+    color: var(--input-border-color-focus);
+    font-size: 1.6em;
+    font-weight: 300;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-shadow: none;
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+ 
+.register-form input {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 0;
+    font-size: 0.9em;
+    outline: none;
+    transition: all 0.3s ease;
+}
+ 
+.register-form input:focus {
+    border-bottom-color: var(--input-border-color-focus);
+}
+ 
+.register-form button,
+.google-login button {
+    width: 200px;
+    height: 40px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+ 
+.register-form button {
+    background: var(--login-button-bg-color);
+    color: white;
+    border: none;
+}
+ 
+.register-form button:hover {
+    background: var(--login-button-hover-bg-color);
+}
+ 
+.google-login button {
+    background-color: white;
+    color: var(--google-button-text-color);
+    border: 1px solid var(--google-button-border-color);
+    padding: 10px 20px;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+ 
+.google-login button:hover {
+    background-color: var(--google-button-hover-bg-color);
+    color: var(--google-button-hover-text-color);
+}
+ 
+.google-login img {
+    margin-right: 10px;
+}

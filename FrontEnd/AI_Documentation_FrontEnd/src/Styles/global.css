@@ -1,0 +1,40 @@
+
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+  
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+  
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  
+    --main-bg-color-start: #f2fcfe;
+    --main-bg-color-middle: #1c92d2;
+    --main-bg-color-end: #f2fcfe;
+    --input-border-color: #1c92d2;
+    --input-border-color-error: red;
+    --input-border-color-focus: #333;
+    --login-button-bg-color: #1c92d2;
+    --login-button-hover-bg-color: #1a82b8;
+    --google-button-border-color: #4285f4;
+    --google-button-text-color: #4285f4;
+    --google-button-hover-bg-color: #1c92d2;
+    --google-button-hover-text-color: white;
+    --error-text-color: red;
+  
+    --link-color: #646cff;
+    --link-hover-color-light: #747bff;
+    --link-hover-color-dark: #535bf2;
+    --button-bg-color-dark: #1a1a1a;
+    --button-bg-color-light: #f9f9f9;
+    --button-border-hover-color: #646cff;
+    --body-text-color: #213547;
+    --body-bg-color: #ffffff;
+  }
+  
