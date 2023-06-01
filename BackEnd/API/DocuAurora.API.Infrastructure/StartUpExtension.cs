@@ -1,33 +1,33 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using DocuAurora.Services.Data;
-using DocuAurora.Services.Messaging;
-using DocuAurora.Data;
-using DocuAurora.Data.Common;
-using DocuAurora.Data.Common.Repositories;
-using DocuAurora.Data.Repositories;
-using DocuAurora.Data.Models.MongoDB;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using DocuAurora.Data.Models;
-using Microsoft.AspNetCore.Identity;
-
-using Serilog;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Linq;
-
-namespace DocuAurora.API.Infrastructure
+﻿namespace DocuAurora.API.Infrastructure
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    using DocuAurora.Data;
+    using DocuAurora.Data.Common;
+    using DocuAurora.Data.Common.Repositories;
+    using DocuAurora.Data.Models;
+    using DocuAurora.Data.Models.MongoDB;
+    using DocuAurora.Data.Repositories;
+    using DocuAurora.Services.Data;
+    using DocuAurora.Services.Messaging;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
+    using Microsoft.OpenApi.Models;
+    using MongoDB.Driver;
+    using Serilog;
+
     public static class StartUpExtension
     {
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
@@ -47,6 +47,7 @@ namespace DocuAurora.API.Infrastructure
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<IAdminService, AdminService>();
+            services.AddTransient<IChatGPTService, ChatGPTService>();
 
             return services;
         }
