@@ -93,18 +93,7 @@
                 .AddDefaultTokenProviders();
 
             // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
-            services.AddSession(options =>
-            {
-                options.Cookie.HttpOnly = true;
-                options.IdleTimeout = new TimeSpan(1, 0, 0, 0);
-            });
-
-            services.Configure<CookiePolicyOptions>(
-                options =>
-                {
-                    options.CheckConsentNeeded = context => true;
-                    options.MinimumSameSitePolicy = SameSiteMode.None;
-                });
+            services.ConfigureCookie();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -113,29 +102,16 @@
             services.AddSingleton(configuration);
 
             // MongoDB
-            services.Configure<DocumentStoreDatabaseSettings>(
-    configuration.GetSection(nameof(DocumentStoreDatabaseSettings)));
-            services.AddSingleton<IDocumentStoreDatabaseSettings>(sp =>
-             sp.GetRequiredService<IOptions<DocumentStoreDatabaseSettings>>().Value);
-            services.AddSingleton<IMongoClient>(s =>
-        new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
+            services.ConfigureMongoDB(configuration);
 
             // Data repositories
-            services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbQueryRunner, DbQueryRunner>();
-            services.AddScoped<IDocumentService, DocumentService>();
+            services.ConfigureDataRepositories();
 
             // Application services
-            services.AddTransient<IEmailSender, NullMessageSender>();
-            services.AddTransient<IAdminService, AdminService>();
+            services.ConfigureApplicationServices();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
-
-            services.AddAuthentication();
+            // Swagger configuration
+            services.ConfigureSwagger();
         }
 
         private static void Configure(WebApplication app)

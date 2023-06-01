@@ -18,6 +18,13 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\DocuAurora.Services.Data\DocuAurora.Services.Data.csproj" />
+    <ProjectReference Include="..\..\Services\DocuAurora.Services.Messaging\DocuAurora.Services.Messaging.csproj" />
+  </ItemGroup>
 </Project>
