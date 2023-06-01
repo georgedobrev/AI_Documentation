@@ -44,7 +44,7 @@
             // Add services to the container SeriLog.
             builder.ConfigureSeriLog();
 
-            ConfigureServices(builder.Services, builder.Configuration);
+            builder.Services.ConfigureServices(builder.Configuration);
 
             // Authentication + JWT Bearer + addGoogle auth
             builder.Services.ConfigureAuthentication(builder.Configuration);
@@ -57,35 +57,6 @@
             
         }
 
-        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
-            // MS SQL DB
-            services.ConfigureMSSQLDB(configuration);
-
-            // Identity
-            services.ConfigureIdentity();
-
-            // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
-            services.ConfigureCookie();
-
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddControllers().AddNewtonsoftJson();
-
-            services.AddSingleton(configuration);
-
-            // MongoDB
-            services.ConfigureMongoDB(configuration);
-
-            // Data repositories
-            services.ConfigureDataRepositories();
-
-            // Application services
-            services.ConfigureApplicationServices();
-
-            // Swagger configuration
-            services.ConfigureSwagger();
-        }
 
         private static void Configure(WebApplication app)
         {
