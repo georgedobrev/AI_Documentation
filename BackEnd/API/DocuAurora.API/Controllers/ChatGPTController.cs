@@ -24,14 +24,10 @@ namespace DocuAurora.API.Controllers
 
     public class ChatGPTController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly IChatGPTService _chatGPTService;
 
-        public ChatGPTController(
-            IConfiguration configuration,
-            IChatGPTService chatGPTService)
+        public ChatGPTController(IChatGPTService chatGPTService)
         {
-            this._configuration = configuration;
             this._chatGPTService = chatGPTService;
         }
 
@@ -44,4 +40,3 @@ namespace DocuAurora.API.Controllers
 
     }
 }
-
