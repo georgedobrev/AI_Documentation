@@ -2,6 +2,7 @@
 using DocuAurora.Data.Models;
 using DocuAurora.Services.Messaging;
 using Google.Apis.Auth;
+using Google.Apis.Oauth2.v2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
@@ -27,13 +29,16 @@ namespace DocuAurora.API.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
+        private readonly AuthService _authService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender)
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, AuthService authService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
+            _authService = authService;
 
         }
 
@@ -175,52 +180,22 @@ namespace DocuAurora.API.Controllers
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return Ok();
+            var result = await _authService.SendPasswordResetEmail(model.Email);
 
-            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user.Id};{code}"));
-            var callbackUrl = Url.Action(nameof(ShowResetPasswordForm), "Account", new {token = token}, protocol: Request.Scheme);
-
-            // Email the user the callback link here.
-            var message = $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>";
-            await _emailSender.SendEmailAsync("vladislav.milchov.work@gmail.com", "Vladislav", model.Email, "Reset Password", message);
-
-            return Ok();
+            return result ? Ok() : BadRequest();
         }
 
-        [HttpGet("resetpassword")]
-        public IActionResult ShowResetPasswordForm(string token)
+        [HttpPost("resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery]string token, [FromBody] ResetPasswordViewModel model)
         {
-            var credations = Encoding.UTF8.GetString(Convert.FromBase64String(token)).Split(";");
-            
-            // Generate a URL to your client-side application. This would be a page where the user
-            // can enter their new password. You might pass the user ID and code as query parameters.
-          //  var resetPassword = $"user = {userId} code = {code}";
-            // Return the URL to the client
-            return Ok();
+            if (!ModelState.IsValid) return BadRequest();
+
+            var result = await _authService.ResetPassword(token, model.Password);
+
+            return result.Succeeded ? Ok() : BadRequest(result.Errors.Select(e => e.Description));
         }
 
-        [HttpPost("resetpassword/{token}")]
-        public async Task<IActionResult> ResetPassword(string token, ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-                // Don't reveal that the user does not exist
-                return BadRequest();
-
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (!result.Succeeded)
-                return BadRequest();
-
-            return Ok();
-        }
     }
 }

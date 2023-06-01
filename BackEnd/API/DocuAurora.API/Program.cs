@@ -128,6 +128,7 @@
             services.AddTransient < IEmailSender > (i =>
             new SendGridEmailSender(configuration.GetValue<string>("SendGridSettings:SendGridApiKey")));
             services.AddTransient<IAdminService, AdminService>();
+            services.AddTransient<AuthService>();
 
             services.AddSwaggerGen(c =>
             {

@@ -10,12 +10,6 @@ namespace DocuAurora.API.ViewModels.Administration.Users
     public class ResetPasswordViewModel
     {
         [Required]
-        public string UserId { get; set; }
-
-        [Required]
-        public string Code { get; set; }
-
-        [Required]
         public string Password { get; set; }
     }
 }
