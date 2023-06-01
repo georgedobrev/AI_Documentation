@@ -22,11 +22,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Linq;
 
 namespace DocuAurora.API.Infrastructure
 {
-	public static class StartUpExtension
-	{
+    public static class StartUpExtension
+    {
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
@@ -94,7 +97,25 @@ namespace DocuAurora.API.Infrastructure
         public static IServiceCollection ConfigureMSSQLDB(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(
-               options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+               options =>
+               {
+                   options.UseSqlServer(
+                   configuration.GetConnectionString("DefaultConnection"),
+                   providerOptions => providerOptions.EnableRetryOnFailure(
+                       maxRetryCount: 3,
+                       maxRetryDelay: TimeSpan.FromSeconds(1),
+                       errorNumbersToAdd: new List<int> { 4060 }));
+                   options.LogTo(
+                     filter: (eventId, level) => eventId.Id == CoreEventId.ExecutionStrategyRetrying,
+                     logger: (eventData) =>
+                     {
+                         var retryEventData = eventData as ExecutionStrategyEventData;
+                         var exceptions = retryEventData.ExceptionsEncountered;
+                         Log.Warning($"Retry #{exceptions.Count} with delay {retryEventData.Delay} due to error: {exceptions.Last().Message}");
+
+                     });
+         
+               });
 
             return services;
         }
@@ -117,10 +138,12 @@ namespace DocuAurora.API.Infrastructure
             builder.Logging.ClearProviders();
             builder.Logging.AddSerilog(logger);
 
+            Log.Logger = logger;
+
             return builder;
         }
 
-        public static IServiceCollection ConfigureAuthentication(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
             {
