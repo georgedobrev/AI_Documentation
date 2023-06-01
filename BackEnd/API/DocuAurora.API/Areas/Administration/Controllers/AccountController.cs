@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -181,11 +180,11 @@ namespace DocuAurora.API.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-
                 return Ok();
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id,code = code}, protocol: Request.Scheme);
+            var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user.Id};{code}"));
+            var callbackUrl = Url.Action(nameof(ShowResetPasswordForm), "Account", new {token = token}, protocol: Request.Scheme);
 
             // Email the user the callback link here.
             var message = $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>";
@@ -195,17 +194,19 @@ namespace DocuAurora.API.Controllers
         }
 
         [HttpGet("resetpassword")]
-        public IActionResult ShowResetPasswordForm(string userId, string code)
+        public IActionResult ShowResetPasswordForm(string token)
         {
+            var credations = Encoding.UTF8.GetString(Convert.FromBase64String(token)).Split(";");
+            
             // Generate a URL to your client-side application. This would be a page where the user
             // can enter their new password. You might pass the user ID and code as query parameters.
-            var resetPassword = $"user = {userId} code = {code}";
+          //  var resetPassword = $"user = {userId} code = {code}";
             // Return the URL to the client
-            return Ok(new { ResetPasswordUrl = resetPassword });
+            return Ok();
         }
 
-        [HttpPost("resetpassword")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        [HttpPost("resetpassword/{token}")]
+        public async Task<IActionResult> ResetPassword(string token, ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
