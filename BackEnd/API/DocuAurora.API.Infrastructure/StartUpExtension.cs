@@ -184,6 +184,37 @@ namespace DocuAurora.API.Infrastructure
 
             return services;
         }
+
+
+        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            // MS SQL DB
+            services.ConfigureMSSQLDB(configuration);
+
+            // Identity
+            services.ConfigureIdentity();
+
+            // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
+            services.ConfigureCookie();
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddControllers().AddNewtonsoftJson();
+
+            services.AddSingleton(configuration);
+
+            // MongoDB
+            services.ConfigureMongoDB(configuration);
+
+            // Data repositories
+            services.ConfigureDataRepositories();
+
+            // Application services
+            services.ConfigureApplicationServices();
+
+            // Swagger configuration
+            services.ConfigureSwagger();
+        }
     }
 }
 
