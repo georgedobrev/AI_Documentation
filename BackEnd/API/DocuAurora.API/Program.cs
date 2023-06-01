@@ -85,12 +85,11 @@
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(
-                options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            // MS SQL DB
+            services.ConfigureMSSQLDB(configuration);
 
-            services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
-                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            // Identity
+            services.ConfigureIdentity();
 
             // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
             services.ConfigureCookie();
