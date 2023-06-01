@@ -17,6 +17,12 @@ using Microsoft.EntityFrameworkCore;
 using DocuAurora.Data.Models;
 using Microsoft.AspNetCore.Identity;
 
+using Serilog;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 namespace DocuAurora.API.Infrastructure
 {
 	public static class StartUpExtension
@@ -98,6 +104,46 @@ namespace DocuAurora.API.Infrastructure
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            return services;
+        }
+
+        public static WebApplicationBuilder ConfigureSeriLog(this WebApplicationBuilder builder)
+        {
+            var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .Enrich.FromLogContext()
+                    .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
+
+            return builder;
+        }
+
+        public static IServiceCollection ConfigureAuthentication(this IServiceCollection services,IConfiguration configuration)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]))
+                };
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+            });
 
             return services;
         }

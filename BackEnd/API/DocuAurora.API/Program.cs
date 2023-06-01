@@ -44,36 +44,11 @@
 
             ConfigureServices(builder.Services, builder.Configuration);
 
-            // Add services to the container.
-            var logger = new LoggerConfiguration()
-              .ReadFrom.Configuration(builder.Configuration)
-              .Enrich.FromLogContext()
-              .CreateLogger();
-            builder.Logging.ClearProviders();
-            builder.Logging.AddSerilog(logger);
+            // Add services to the container SeriLog.
+            builder.ConfigureSeriLog();
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidAudience = configuration["JwtSettings:Audience"],
-                    ValidIssuer = configuration["JwtSettings:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]))
-                };
-            }).AddGoogle(googleOptions =>
-            {
-                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-            });
+            // Authentication + JWT Bearer + addGoogle auth
+            builder.Services.ConfigureAuthentication(builder.Configuration);
 
             var app = builder.Build();
             Configure(app);
