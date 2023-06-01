@@ -1,31 +1,34 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using DocuAurora.Services.Data;
-using DocuAurora.Services.Messaging;
-using DocuAurora.Data;
-using DocuAurora.Data.Common;
-using DocuAurora.Data.Common.Repositories;
-using DocuAurora.Data.Repositories;
-using DocuAurora.Data.Models.MongoDB;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using DocuAurora.Data.Models;
-using Microsoft.AspNetCore.Identity;
-
-using Serilog;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
-namespace DocuAurora.API.Infrastructure
+﻿namespace DocuAurora.API.Infrastructure
 {
-	public static class StartUpExtension
+    using System;
+    using System.Text;
+
+    using DocuAurora.Data;
+    using DocuAurora.Data.Common;
+    using DocuAurora.Data.Common.Repositories;
+    using DocuAurora.Data.Models;
+    using DocuAurora.Data.Models.MongoDB;
+    using DocuAurora.Data.Repositories;
+    using DocuAurora.Services.Data;
+    using DocuAurora.Services.Messaging;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
+    using Microsoft.OpenApi.Models;
+    using MongoDB.Driver;
+    using Serilog;
+    using Microsoft.AspNetCore.Diagnostics;
+    using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+
+    public static class StartUpExtension
 	{
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
@@ -146,6 +149,36 @@ namespace DocuAurora.API.Infrastructure
             });
 
             return services;
+        }
+
+        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            // MS SQL DB
+            services.ConfigureMSSQLDB(configuration);
+
+            // Identity
+            services.ConfigureIdentity();
+
+            // cookie enhancing security by protecting against cross-site scripting (XSS) attacks.
+            services.ConfigureCookie();
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddControllers().AddNewtonsoftJson();
+
+            services.AddSingleton(configuration);
+
+            // MongoDB
+            services.ConfigureMongoDB(configuration);
+
+            // Data repositories
+            services.ConfigureDataRepositories();
+
+            // Application services
+            services.ConfigureApplicationServices();
+
+            // Swagger configuration
+            services.ConfigureSwagger();
         }
     }
 }
