@@ -1,6 +1,5 @@
 @import './global.css';
 
-
 .App {
     display: flex;
     justify-content: center;
@@ -32,11 +31,10 @@
     height: auto;
 }
 
-
 .login-form h2 {
     margin-top: 23px;
     margin-bottom: 30px;
-    color: #333;
+    color: var(--input-border-color-focus);
     font-size: 1.6em;
     font-weight: 300;
     text-align: center;
