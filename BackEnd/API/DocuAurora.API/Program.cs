@@ -41,11 +41,10 @@
 
             ConfigurationManager configuration = builder.Configuration;
 
-
-            ConfigureServices(builder.Services, builder.Configuration);
-
             // Add services to the container SeriLog.
             builder.ConfigureSeriLog();
+
+            ConfigureServices(builder.Services, builder.Configuration);
 
             // Authentication + JWT Bearer + addGoogle auth
             builder.Services.ConfigureAuthentication(builder.Configuration);
