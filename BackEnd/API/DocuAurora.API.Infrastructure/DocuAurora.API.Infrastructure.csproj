@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Services\DocuAurora.Services.Data\DocuAurora.Services.Data.csproj" />
+    <ProjectReference Include="..\..\Services\DocuAurora.Services.Data\DocuAurora.Services.csproj" />
     <ProjectReference Include="..\..\Services\DocuAurora.Services.Messaging\DocuAurora.Services.Messaging.csproj" />
   </ItemGroup>
 </Project>

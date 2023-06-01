@@ -36,6 +36,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocuAurora.API", "API\DocuAurora.API\DocuAurora.API.csproj", "{03212FCA-DEF6-4BF0-B906-372985E1D8B7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocuAurora.API.Infrastructure", "API\DocuAurora.API.Infrastructure\DocuAurora.API.Infrastructure.csproj", "{CDC83684-A330-4BAC-B1A2-8031F9C70559}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8522212F-F01E-4E20-9975-FCF5E10D71DB} = {8522212F-F01E-4E20-9975-FCF5E10D71DB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocuAurora.API.ViewModels", "API\DocuAurora.API.ViewModels\DocuAurora.API.ViewModels.csproj", "{49C859E9-5F49-4BE5-ACD7-96E3DE2CF81C}"
 EndProject
