@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+    <PackageReference Include="OpenAI" Version="1.7.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
@@ -29,8 +30,5 @@
 
   <ItemGroup>
     <None Remove="Contracts\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Contracts\" />
   </ItemGroup>
 </Project>

@@ -12,6 +12,7 @@
     using DocuAurora.Data.Models.MongoDB;
     using DocuAurora.Data.Repositories;
     using DocuAurora.Services.Data;
+    using DocuAurora.Services.Data.Contracts;
     using DocuAurora.Services.Messaging;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
