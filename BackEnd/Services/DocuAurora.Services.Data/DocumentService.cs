@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DocuAurora.Services.Data
 {
-    public class DocumentService : IDocumentService
+    public class DocumentService 
     {
         private IMongoCollection<Document> _documents;
 
