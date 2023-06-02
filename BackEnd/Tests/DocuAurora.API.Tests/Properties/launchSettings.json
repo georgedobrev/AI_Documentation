@@ -18,7 +18,7 @@
     "DocuAurora.API.Tests": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:37524",
+      "applicationUrl": "http://localhost:64791",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

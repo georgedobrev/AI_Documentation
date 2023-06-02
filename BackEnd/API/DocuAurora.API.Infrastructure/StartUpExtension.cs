@@ -33,9 +33,23 @@
     {
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(x =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the bearer scheme",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+                x.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {new OpenApiSecurityScheme{Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }}, new List<string>() }
+                });
             });
 
             services.AddAuthentication();
@@ -49,6 +63,7 @@
             services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
+            services.AddTransient<AuthService>();
 
             return services;
         }
@@ -59,7 +74,6 @@
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IDbQueryRunner, DbQueryRunner>();
-            services.AddScoped<IDocumentService, DocumentService>();
 
             return services;
         }
@@ -67,10 +81,6 @@
         public static IServiceCollection ConfigureMongoDB(this IServiceCollection services, IConfiguration configuration)
         {
             // MongoDB
-            services.Configure<DocumentStoreDatabaseSettings>(
-    configuration.GetSection(nameof(DocumentStoreDatabaseSettings)));
-            services.AddSingleton<IDocumentStoreDatabaseSettings>(sp =>
-             sp.GetRequiredService<IOptions<DocumentStoreDatabaseSettings>>().Value);
             services.AddSingleton<IMongoClient>(s =>
         new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
 

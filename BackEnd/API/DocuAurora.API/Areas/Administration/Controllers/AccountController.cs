@@ -43,7 +43,7 @@ namespace DocuAurora.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] LoginUserViewModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
             var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
