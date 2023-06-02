@@ -33,9 +33,23 @@
     {
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(x =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the bearer scheme",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+                x.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {new OpenApiSecurityScheme{Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }}, new List<string>() }
+                });
             });
 
             services.AddAuthentication();
