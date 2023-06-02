@@ -59,7 +59,6 @@
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IDbQueryRunner, DbQueryRunner>();
-            services.AddScoped<IDocumentService, DocumentService>();
 
             return services;
         }
@@ -68,9 +67,7 @@
         {
             // MongoDB
             services.Configure<DocumentStoreDatabaseSettings>(
-    configuration.GetSection(nameof(DocumentStoreDatabaseSettings)));
-            services.AddSingleton<IDocumentStoreDatabaseSettings>(sp =>
-             sp.GetRequiredService<IOptions<DocumentStoreDatabaseSettings>>().Value);
+    configuration.GetSection("DocumentStoreDatabaseSettings:ConnectionString"));
             services.AddSingleton<IMongoClient>(s =>
         new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
 
