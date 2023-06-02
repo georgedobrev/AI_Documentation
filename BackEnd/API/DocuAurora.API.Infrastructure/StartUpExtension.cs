@@ -81,8 +81,6 @@
         public static IServiceCollection ConfigureMongoDB(this IServiceCollection services, IConfiguration configuration)
         {
             // MongoDB
-            services.Configure<DocumentStoreDatabaseSettings>(
-    configuration.GetSection("DocumentStoreDatabaseSettings:ConnectionString"));
             services.AddSingleton<IMongoClient>(s =>
         new MongoClient(configuration.GetValue<string>("DocumentStoreDatabaseSettings:ConnectionString")));
 
