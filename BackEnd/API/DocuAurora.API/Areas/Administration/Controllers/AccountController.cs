@@ -1,42 +1,23 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using DocuAurora.API.ViewModels.Administration.Users;
+using DocuAurora.Data.Models;
+using DocuAurora.Services.Messaging;
+using Google.Apis.Auth;
+using Google.Apis.Oauth2.v2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
-using System.Threading.Tasks;
-
-using DocuAurora.API.ViewModels;
-using DocuAurora.Data.Models;
-using DocuAurora.API.ViewModels.Administration.Users;
-
-using System.IdentityModel.Tokens.Jwt;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System;
-
-using Microsoft.IdentityModel.Tokens;
-
-using System.Text;
-
 using Microsoft.Extensions.Configuration;
-
-using System.Configuration;
-using System.Threading;
-using Google.Apis.Auth.OAuth2.Flows;
-using Google.Apis.Oauth2.v2;
-using Google.Apis.Auth.OAuth2;
-using System.Net.Http;
-using Microsoft.VisualBasic;
-using NuGet.Common;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.ComponentModel.DataAnnotations;
-using System.Numerics;
-using System.Reflection.Metadata;
-using System.Runtime.Intrinsics.X86;
-using Google.Apis.Auth;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DocuAurora.API.Controllers
 {
@@ -46,13 +27,19 @@ namespace DocuAurora.API.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
+        private readonly AuthService _authService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, AuthService authService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _emailSender = emailSender;
+            _authService = authService;
+
         }
 
         [HttpPost("register")]
@@ -193,42 +180,22 @@ namespace DocuAurora.API.Controllers
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                // Don't reveal that the user does not exist or is not confirmed
-                return Ok();
+            var result = await _authService.SendPasswordResetEmail(model.Email);
 
-            // For more information on how to enable account confirmation and password reset please 
-            // visit https://go.microsoft.com/fwlink/?LinkID=532713
-            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-
-            // Email the user the callback link here. You'll need to setup an email service for this.
-            // await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-            //    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-
-            return Ok();
+            return result ? Ok() : BadRequest();
         }
 
         [HttpPost("resetpassword")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword([FromQuery]string token, [FromBody] ResetPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
 
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-                // Don't reveal that the user does not exist
-                return BadRequest();
+            var result = await _authService.ResetPassword(token, model.Password);
 
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (!result.Succeeded)
-                return BadRequest();
-
-            return Ok();
+            return result.Succeeded ? Ok() : BadRequest(result.Errors.Select(e => e.Description));
         }
+
     }
 }
