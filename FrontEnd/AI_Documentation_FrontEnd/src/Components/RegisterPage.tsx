@@ -1,7 +1,8 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import '../Styles/RegisterPageStyles.css';
-import logo from '../assets/DocuAuroraLogo_prev_ui.png'; 
+import logo from '../assets/DocuAuroraLogo_prev_ui.png';
+import { registerUser } from '../Services/api'; // adjust path according to your project structure
 
 const validationSchema = Yup.object({
     username: Yup.string()
@@ -27,8 +28,16 @@ function RegisterPage() {
             password: '',
         },
         validationSchema: validationSchema,
-        onSubmit: (values) => {
-            console.log(values);
+        onSubmit: async (values) => {
+            try {
+                const user = await registerUser(values);
+                console.log(user);
+                // Here, you can set user data into a state management library (like Redux or Zustand),
+                // local storage or pass it to another component via props or context API
+            } catch (error) {
+                console.error(error);
+                // Handle error as per your needs
+            }
         },
     });
 
