@@ -9,6 +9,7 @@ namespace DocuAurora.API.Controllers
     using System.Threading.Tasks;
 
     using DocuAurora.Common;
+    using DocuAurora.Services.Data.Contracts;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
@@ -23,60 +24,19 @@ namespace DocuAurora.API.Controllers
 
     public class ChatGPTController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly IChatGPTService _chatGPTService;
 
-        public ChatGPTController(IConfiguration configuration)
+        public ChatGPTController(IChatGPTService chatGPTService)
         {
-            this._configuration = configuration;
-        }
-
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            this._chatGPTService = chatGPTService;
         }
 
         // POST api/values
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]string value)
+        public async Task<IActionResult> Post([FromBody] string value)
         {
-            OpenAIAPI api = new OpenAIAPI(this._configuration["ChatGPTAPIkey"]);
-
-            var chat = api.Chat.CreateConversation();
-
-            CompletionRequest completionRequest = new CompletionRequest();
-            completionRequest.Prompt = value;
-            completionRequest.Model = OpenAI_API.Models.Model.ChatGPTTurbo;
-
-            /// give instruction as System
-            chat.AppendSystemMessage("You are a writer.");
-
-            chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplate"], value));
-
-            string response = await chat.GetResponseFromChatbotAsync();
-
-            return Ok(response);
+            return Ok(this._chatGPTService.GenerateResponseChatGPT(value));
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
-

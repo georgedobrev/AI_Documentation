@@ -1,6 +1,8 @@
 ﻿using DocuAurora.API.ViewModels.Administration.Users;
+using DocuAurora.Data;
 using DocuAurora.Data.Models;
 using DocuAurora.Services.Mapping;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,13 +19,16 @@ namespace DocuAurora.Services.Data
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly ApplicationDbContext _dbContext;
 
         public AdminService(
                             UserManager<ApplicationUser> userManager,
-                            RoleManager<ApplicationRole> roleManager)
+                            RoleManager<ApplicationRole> roleManager,
+                            ApplicationDbContext dbContext)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
+            this._dbContext = dbContext;
         }
 
         public async Task<IEnumerable<string>> FilterRolesThatAreNotAlreadySetAsync(IEnumerable<string> roles, ApplicationUser user)
@@ -48,6 +53,7 @@ namespace DocuAurora.Services.Data
 
         public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
         {
+
             var users = await this._userManager.Users
                                                .Include(x => x.Roles)
                                                .ToListAsync();

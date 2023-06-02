@@ -5,7 +5,7 @@ using System;
 
 namespace DocuAurora.API.ViewModels.Administration.Users
 {
-	public class UserViewModel : BaseUserViewModel , IMapFrom<ApplicationUser>
+	public class UserViewModel : BaseUserViewModel 
 	{
 		
 	}

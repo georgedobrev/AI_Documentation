@@ -75,7 +75,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
-        { 
+        {
             var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
 
             if (!filteredRoleList.Any())
