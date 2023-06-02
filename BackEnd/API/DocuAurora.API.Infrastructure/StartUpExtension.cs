@@ -49,6 +49,7 @@
             services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
+            services.AddTransient<AuthService>();
 
             return services;
         }
