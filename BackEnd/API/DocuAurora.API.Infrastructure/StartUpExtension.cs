@@ -197,9 +197,19 @@
             return services;
         }
 
+        public static IServiceCollection ConfigureRabittMQ(this IServiceCollection services)
+        {
+            // RabittMQ
+            services.AddSingleton<IRabbitMQService,RabittMQService>();
+
+            return services;
+        }
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // RabittMQ
+            services.ConfigureRabittMQ();
+
             // MS SQL DB
             services.ConfigureMSSQLDB(configuration);
 
