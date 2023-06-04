@@ -1,4 +1,4 @@
-﻿namespace DocuAurora.Services.Data
+﻿namespace DocuAurora.Services.Data.Configurations
 {
     public class RabbitMQOptions
     {
