@@ -16,47 +16,19 @@ namespace DocuAurora.Services.Data
 {
     public class RabittMQService : IRabbitMQService
     {
-        private readonly IOptions<RabbitMQOptions> _rabittOptions;
-        private readonly ConnectionFactory _connectionFactory;
-        private readonly Lazy<IConnection> _connectionCreation;
-        private readonly Lazy<IModel> _channelCreation;
+        private readonly IModel channel;
 
-        public RabittMQService(IOptions<RabbitMQOptions> rabittOptions)
+        public RabittMQService(IModel channel)
         {
-            this._rabittOptions = rabittOptions;
-            this._connectionFactory = new ConnectionFactory
-            {
-               HostName = this._rabittOptions.Value.HostName,
-            };
-
-            this._connectionCreation = new Lazy<IConnection>(() => this._connectionFactory.CreateConnection());
-            this._channelCreation = new Lazy<IModel>(() => this.Connection.CreateModel());
+            this.channel = channel;
         }
 
-        private IConnection Connection => this._connectionCreation.Value;
-        private IModel Channel => this._channelCreation.Value;
 
-        public void SendMessage<T>(string queue, string exchange, string routingKey, T message, IBasicProperties properties = null)
+        public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties = null)
         {
-            this.SetupUpQueue(queue, exchange, routingKey);
-
             var output = JsonSerializer.Serialize(message);
 
-            this.Channel.BasicPublish(exchange, routingKey, properties, Encoding.UTF8.GetBytes(output));
-        }
-
-        private void SetupUpQueue(string queue, string exchange, string routingKey)
-        {
-            this.Channel.ExchangeDeclare(exchange, ExchangeType.Direct);
-
-            this.Channel.QueueDeclare(
-               queue,
-               durable: false,
-               exclusive: false,
-               autoDelete: false,
-               arguments: null);
-
-            this.Channel.QueueBind(queue,exchange,routingKey);
+            this.channel.BasicPublish(exchange, routingKey, properties, Encoding.UTF8.GetBytes(output));
         }
     }
 }
