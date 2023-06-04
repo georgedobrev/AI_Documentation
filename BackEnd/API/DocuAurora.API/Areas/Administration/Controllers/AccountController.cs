@@ -46,11 +46,33 @@ namespace DocuAurora.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
-            var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _authService.RegisterUser(model.Username, model.Email, model.Password);
 
-            return Ok(result);
+            if (result.Succeeded)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
 
+        }
+
+        [HttpGet("confirmemail")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return BadRequest("A code must be supplied for email confirmation.");
+
+            var result = await _authService.ConfirmEmail(token);
+
+            if (result.Succeeded)
+            {
+                return Ok("Email confirmation succeeded.");
+            }
+
+            return BadRequest("Email confirmation failed.");
         }
 
         [HttpPost("login")]

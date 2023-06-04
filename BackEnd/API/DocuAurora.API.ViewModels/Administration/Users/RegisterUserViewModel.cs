@@ -9,6 +9,8 @@ namespace DocuAurora.API.ViewModels.Administration.Users
 {
     public class RegisterUserViewModel
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]
