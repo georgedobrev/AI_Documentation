@@ -1,24 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-
-using DocuAurora.API.ViewModels.Administration.Users;
-using DocuAurora.Data.Models;
-using DocuAurora.Services.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DocuAurora.API.Areas.Administration.Controllers
 {
-    //TO DO -> ONLY ADMIN TO HAVE ACCESS
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using DocuAurora.API.ViewModels.Administration.Users;
+    using DocuAurora.Common;
+    using DocuAurora.Data.Models;
+    using DocuAurora.Services.Data;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
 
     [Route("api/[controller]")]
-    public class UsersController : Controller
+    [ApiController]
+    [Authorize(Roles = GlobalConstants.AdministratorRoleName)]
+
+    public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAdminService _adminService;
@@ -72,7 +75,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(string id, [FromBody] List<string> roles)
-        { 
+        {
             var filteredRoleList = await this._adminService.FilterRolesThatExistsAsync(roles);
 
             if (!filteredRoleList.Any())

@@ -4,8 +4,6 @@ namespace DocuAurora.API.ViewModels.Administration.Users
 {
     public class LoginUserViewModel
     {
-       
-        public string  id { get; set; }
 
         [Required]
         public string Username { get; set; }
@@ -13,6 +11,5 @@ namespace DocuAurora.API.ViewModels.Administration.Users
         [Required]
         public string Password { get; set; }
 
-        public string Email { get; set; }
     }
 }
