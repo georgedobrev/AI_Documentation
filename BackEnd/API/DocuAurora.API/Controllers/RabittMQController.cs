@@ -18,7 +18,7 @@ namespace DocuAurora.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] string value)
         {
-            this._rabbitMQService.SendMessage("test-queue", "test-exchange", "api/RabittMQ", value);
+            this._rabbitMQService.SendMessage(value);
 
             return Ok();
         }
