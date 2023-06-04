@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Linq;
     using System.Text;
 
@@ -12,6 +13,7 @@
     using DocuAurora.Data.Models.MongoDB;
     using DocuAurora.Data.Repositories;
     using DocuAurora.Services.Data;
+    using DocuAurora.Services.Data.Configurations;
     using DocuAurora.Services.Data.Contracts;
     using DocuAurora.Services.Messaging;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -197,8 +199,10 @@
             return services;
         }
 
-        public static IServiceCollection ConfigureRabittMQ(this IServiceCollection services)
+        public static IServiceCollection ConfigureRabittMQ(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<RabbitMQOptions>(configuration.GetSection("RabbitMQConfiguration"));
+
             // RabittMQ
             services.AddSingleton<IRabbitMQService,RabittMQService>();
 
@@ -208,7 +212,7 @@
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             // RabittMQ
-            services.ConfigureRabittMQ();
+            services.ConfigureRabittMQ(configuration);
 
             // MS SQL DB
             services.ConfigureMSSQLDB(configuration);

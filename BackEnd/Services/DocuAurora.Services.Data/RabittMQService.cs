@@ -26,8 +26,7 @@ namespace DocuAurora.Services.Data
             this._rabittOptions = rabittOptions;
             this._connectionFactory = new ConnectionFactory
             {
-               HostName = rabittOptions.Value.HostName,
-               Port = rabittOptions.Value.Port,
+               HostName = this._rabittOptions.Value.HostName,
             };
 
             this._connectionCreation = new Lazy<IConnection>(() => this._connectionFactory.CreateConnection());
