@@ -69,6 +69,7 @@
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
+            services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
             return services;
         }

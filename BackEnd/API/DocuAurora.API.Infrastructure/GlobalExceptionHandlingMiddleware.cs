@@ -1,37 +1,51 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace DocuAurora.API.Infrastructure
 {
-    public class GlobalExceptionHandlingMiddleware
+    public class GlobalExceptionHandlingMiddleware : IMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
+        private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
 
-        public GlobalExceptionHandlingMiddleware(RequestDelegate next, ILogger logger)
+        public GlobalExceptionHandlingMiddleware(ILogger<GlobalExceptionHandlingMiddleware> logger)
         {
-            _next = next;
             _logger = logger;
         }
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
             {
-                await _next(context);
+                await next(context);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error(e, e.Message);
+                _logger.LogError($"Something went wrong: {ex}");
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
+                ProblemDetails problem = new()
+                {
+                    Status = (int)HttpStatusCode.InternalServerError,
+                    Type = "Server error",
+                    Title = "Server error",
+                    Detail = "An Internal server has occurred"
+                };
+
+                string json = JsonConvert.SerializeObject(problem);
+
+                context.Response.WriteAsync(json);
+
+                context.Response.ContentType = "application/json";
             }
+
         }
 
     }
