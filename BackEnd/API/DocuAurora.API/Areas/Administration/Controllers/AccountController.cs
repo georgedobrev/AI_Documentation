@@ -2,7 +2,6 @@
 using DocuAurora.Data.Models;
 using DocuAurora.Services.Messaging;
 using Google.Apis.Auth;
-using Google.Apis.Oauth2.v2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -42,7 +41,7 @@ namespace DocuAurora.API.Controllers
 
         }
 
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
@@ -59,10 +58,10 @@ namespace DocuAurora.API.Controllers
 
         }
 
-        [HttpGet("confirmemail")]
+        [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
         {
-            if (string.IsNullOrWhiteSpace(token)) 
+            if (string.IsNullOrWhiteSpace(token))
             {
                 return BadRequest("A code must be supplied for email confirmation.");
             }
@@ -77,7 +76,7 @@ namespace DocuAurora.API.Controllers
             return BadRequest("Email confirmation failed.");
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginUserViewModel model)
         {
 
@@ -177,7 +176,7 @@ namespace DocuAurora.API.Controllers
 
         }
 
-        [HttpPost("logout")]
+        [HttpPost("Logout")]
 
         public async Task<IActionResult> Logout()
         {
@@ -201,7 +200,7 @@ namespace DocuAurora.API.Controllers
             return token;
         }
 
-        [HttpPost("forgotpassword")]
+        [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -214,8 +213,8 @@ namespace DocuAurora.API.Controllers
             return result ? Ok() : BadRequest();
         }
 
-        [HttpPost("resetpassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery]string token, [FromBody] ResetPasswordViewModel model)
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromBody] ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {

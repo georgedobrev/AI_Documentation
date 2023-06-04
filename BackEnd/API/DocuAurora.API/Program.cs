@@ -82,6 +82,8 @@
             app.UseAuthentication();
             // SERILOG USARNAME INSERTION
             app.UseMiddleware<LogUserNameMiddleware>();
+            app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
             app.UseAuthorization();
 
             app.UseSwagger();
