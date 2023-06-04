@@ -1,9 +1,9 @@
-
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import '../Styles/LoginPageStyles.css';
 import logo from '../assets/DocuAuroraLogo_prev_ui.png'; 
-import { loginUser } from '../Services/api';  // adjust path according to your project structure
+import { loginUser } from '../Service/api';  
+import GoogleLogin from "@leecheuk/react-google-login";
 
 const validationSchema = Yup.object({
     username: Yup.string()
@@ -18,6 +18,10 @@ const validationSchema = Yup.object({
         .required('Password is required.'),
 });
 
+const responseGoogle = (response:any) => {
+    console.log(response);
+}
+
 function LoginPage() {
     const formik = useFormik({
         initialValues: {
@@ -29,11 +33,10 @@ function LoginPage() {
             try {
                 const user = await loginUser(values);
                 console.log(user);
-                // Here, you can set user data into a state management library (like Redux or Zustand),
-                // local storage or pass it to another component via props or context API
+                
             } catch (error) {
                 console.error(error);
-                // Handle error as per your needs
+                
             }
         },
     });
@@ -74,10 +77,19 @@ function LoginPage() {
                     ) : null}
                     <button type='submit'>Login</button>
                     <div className='google-login'>
-                        <button onClick={(event) => console.log("Google Login Clicked!")}>
-                            <img src='https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' alt='Google logo' width='20' />
-                            <span>Sign in with Google</span>
-                        </button>
+                        <GoogleLogin
+                            clientId="30339312390-0fiuo97q0d2cig2vk82l1eftqhbst8kv.apps.googleusercontent.com"
+                            buttonText="Sign in with Google"
+                            onSuccess={responseGoogle}
+                            onFailure={responseGoogle}
+                            cookiePolicy={'single_host_origin'}
+                            render={renderProps => (
+                                <button onClick={renderProps.onClick} disabled={renderProps.disabled}>
+                                    <img src='https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' alt='Google logo' width='20' />
+                                    <span>Sign in with Google</span>
+                                </button>
+                            )}
+                        />
                     </div>
                 </form>
             </div>
