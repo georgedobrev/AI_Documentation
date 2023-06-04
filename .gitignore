@@ -372,5 +372,5 @@ FodyWeavers.xsd
 Migrations/
 
 # Removing appSetings
-appsettings
+appsettings.json
 appsettings.Development
