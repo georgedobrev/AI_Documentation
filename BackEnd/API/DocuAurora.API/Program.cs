@@ -54,10 +54,7 @@
             app.Run();
 
             Log.CloseAndFlush();
-            
         }
-
-
 
         private static void Configure(WebApplication app)
         {
