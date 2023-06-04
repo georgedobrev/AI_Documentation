@@ -77,12 +77,10 @@
 
             app.UseRouting();
 
-           
-
             app.UseAuthentication();
             // SERILOG USARNAME INSERTION
-            app.UseMiddleware<LogUserNameMiddleware>();
             app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+            app.UseMiddleware<LogUserNameMiddleware>();
 
             app.UseAuthorization();
 
