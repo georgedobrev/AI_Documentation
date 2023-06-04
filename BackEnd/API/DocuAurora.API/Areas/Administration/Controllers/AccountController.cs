@@ -62,8 +62,10 @@ namespace DocuAurora.API.Controllers
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(token)) 
+            {
                 return BadRequest("A code must be supplied for email confirmation.");
+            }
 
             var result = await _authService.ConfirmEmail(token);
 
@@ -202,7 +204,10 @@ namespace DocuAurora.API.Controllers
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
             var result = await _authService.SendPasswordResetEmail(model.Email);
 
@@ -212,7 +217,10 @@ namespace DocuAurora.API.Controllers
         [HttpPost("resetpassword")]
         public async Task<IActionResult> ResetPassword([FromQuery]string token, [FromBody] ResetPasswordViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
             var result = await _authService.ResetPassword(token, model.Password);
 
