@@ -1,9 +1,10 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import GoogleLogin from "@leecheuk/react-google-login";
 import '../Styles/LoginPageStyles.css';
 import logo from '../assets/DocuAuroraLogo_prev_ui.png'; 
 import { loginUser } from '../Service/api';  
-import GoogleLogin from "@leecheuk/react-google-login";
+import { GOOGLE_CLIENT_ID } from '../config';
 
 const validationSchema = Yup.object({
     username: Yup.string()
@@ -18,9 +19,27 @@ const validationSchema = Yup.object({
         .required('Password is required.'),
 });
 
-const responseGoogle = (response:any) => {
-    console.log(response);
+interface GoogleLoginResponse {
+    profileObj: {
+      email: string;
+      familyName: string;
+      givenName: string;
+      googleId: string;
+      imageUrl: string;
+      name: string;
+    };
+    tokenId: string;
+  }
+
+interface GoogleLoginResponseOffline {
+    code: string;
 }
+
+type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
+
+const responseGoogle = (response: GoogleResponse) => {
+    console.log(response);
+};
 
 function LoginPage() {
     const formik = useFormik({
@@ -33,13 +52,26 @@ function LoginPage() {
             try {
                 const user = await loginUser(values);
                 console.log(user);
-                
             } catch (error) {
                 console.error(error);
-                
             }
         },
     });
+
+    const renderGoogleLoginButton = () => (
+        <GoogleLogin
+            clientId={GOOGLE_CLIENT_ID}
+            onSuccess={responseGoogle}
+            onFailure={responseGoogle}
+            cookiePolicy={'single_host_origin'}
+            render={renderProps => (
+                <button onClick={renderProps.onClick} disabled={renderProps.disabled}>
+                    <img src='https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' alt='Google logo' width='20' />
+                    <span>Sign in with Google</span>
+                </button>
+            )}
+        />
+    );
 
     return (
         <div className='App'>
@@ -77,19 +109,7 @@ function LoginPage() {
                     ) : null}
                     <button type='submit'>Login</button>
                     <div className='google-login'>
-                        <GoogleLogin
-                            clientId="30339312390-0fiuo97q0d2cig2vk82l1eftqhbst8kv.apps.googleusercontent.com"
-                            buttonText="Sign in with Google"
-                            onSuccess={responseGoogle}
-                            onFailure={responseGoogle}
-                            cookiePolicy={'single_host_origin'}
-                            render={renderProps => (
-                                <button onClick={renderProps.onClick} disabled={renderProps.disabled}>
-                                    <img src='https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' alt='Google logo' width='20' />
-                                    <span>Sign in with Google</span>
-                                </button>
-                            )}
-                        />
+                        {renderGoogleLoginButton()}
                     </div>
                 </form>
             </div>
@@ -98,3 +118,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
