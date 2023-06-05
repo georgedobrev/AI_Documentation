@@ -62,10 +62,9 @@
             return services;
         }
 
-        public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
+        public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             // Application services
-            services.AddTransient<IEmailSender, NullMessageSender>();
             services.AddTransient<IEmailSender>(i =>
           new SendGridEmailSender(configuration.GetValue<string>("SendGridSettings:SendGridApiKey")));
             services.AddTransient<IAdminService, AdminService>();
@@ -278,7 +277,7 @@
             services.ConfigureDataRepositories();
 
             // Application services
-            services.ConfigureApplicationServices();
+            services.ConfigureApplicationServices(configuration);
 
             // Swagger configuration
             services.ConfigureSwagger();
