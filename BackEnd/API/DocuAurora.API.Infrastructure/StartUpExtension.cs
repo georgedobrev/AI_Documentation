@@ -2,8 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Linq;
     using System.Text;
+
+    using RabbitMQ.Client;
 
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
@@ -12,6 +15,7 @@
     using DocuAurora.Data.Models.MongoDB;
     using DocuAurora.Data.Repositories;
     using DocuAurora.Services.Data;
+    using DocuAurora.Services.Data.Configurations;
     using DocuAurora.Services.Data.Contracts;
     using DocuAurora.Services.Messaging;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +32,7 @@
     using Microsoft.OpenApi.Models;
     using MongoDB.Driver;
     using Serilog;
+    using System.Threading.Channels;
 
     public static class StartUpExtension
     {
@@ -197,9 +202,56 @@
             return services;
         }
 
+        public static IServiceCollection ConfigureRabittMQ(
+                                                             this IServiceCollection services,
+                                                             IConfiguration configuration,
+                                                             string queue = "DocuAurora-queue",
+                                                             string exchange = "DocuAurora-exchange",
+                                                             string routingKey = "DocuAurora-api/RabittMQ")
+        {
+            services.AddSingleton<ConnectionFactory>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var connectionFactory = new ConnectionFactory
+                {
+                    HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName")
+            };
+                return connectionFactory;
+            });
+
+            services.AddSingleton<IModel>(provider =>
+            {
+
+                var connectionFactory = provider.GetRequiredService<ConnectionFactory>();
+
+                var connectionCreation = new Lazy<IConnection>(() => connectionFactory.CreateConnection());
+                var channelCreation = new Lazy<IModel>(() => connectionCreation.Value.CreateModel());
+
+                channelCreation.Value.ExchangeDeclare(exchange, ExchangeType.Direct);
+
+                channelCreation.Value.QueueDeclare(
+                   queue,
+                   durable: false,
+                   exclusive: false,
+                   autoDelete: false,
+                   arguments: null);
+
+                channelCreation.Value.QueueBind(queue, exchange, routingKey);
+
+                return channelCreation.Value;
+            });
+
+            // RabittMQ
+            services.AddSingleton<IRabbitMQService, RabittMQService>();
+
+            return services;
+        }
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // RabittMQ
+            services.ConfigureRabittMQ(configuration);
+
             // MS SQL DB
             services.ConfigureMSSQLDB(configuration);
 
