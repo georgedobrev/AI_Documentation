@@ -207,28 +207,26 @@
 
         public static IServiceCollection ConfigureRabittMQ(
                                                              this IServiceCollection services,
-                                                             IConfiguration configuration,
-                                                             string queue = "DocuAurora-queue",
-                                                             string exchange = "DocuAurora-exchange",
-                                                             string routingKey = "DocuAurora-api/RabittMQ")
+                                                             IConfiguration configuration)
         {
             services.AddSingleton<ConnectionFactory>(provider =>
             {
-                var configuration = provider.GetRequiredService<IConfiguration>();
                 var connectionFactory = new ConnectionFactory
                 {
-                    HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName")
+                    HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName"),
                 };
                 return connectionFactory;
             });
 
             services.AddSingleton<IModel>(provider =>
             {
-
                 var connectionFactory = provider.GetRequiredService<ConnectionFactory>();
 
                 var connectionCreation = new Lazy<IConnection>(() => connectionFactory.CreateConnection());
                 var channelCreation = new Lazy<IModel>(() => connectionCreation.Value.CreateModel());
+
+                var exchange = configuration.GetValue<string>("RabbitMQExchangeConfiguration:Exchange");
+                var queue = configuration.GetValue<string>("RabbitMQQueueConfiguration:Queue");
 
                 channelCreation.Value.ExchangeDeclare(exchange, ExchangeType.Direct);
 
@@ -238,6 +236,8 @@
                    exclusive: false,
                    autoDelete: false,
                    arguments: null);
+
+                var routingKey = configuration.GetValue<string>("RabbitMQRoutingKeyConfiguration:RoutingKey");
 
                 channelCreation.Value.QueueBind(queue, exchange, routingKey);
 
