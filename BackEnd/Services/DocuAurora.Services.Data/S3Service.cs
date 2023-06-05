@@ -23,13 +23,7 @@ namespace DocuAurora.Services.Data
 
         public async Task<GetObjectResponse> GetFileAsync(string bucketName, string key)
         {
-            var request = new GetObjectRequest
-            {
-                BucketName = bucketName,
-                Key = key
-            };
-
-            var response = await this._s3Client.GetObjectAsync(request);
+            var response = await this._s3Client.GetObjectAsync(bucketName, key);
             return response;
         }
 
@@ -46,7 +40,6 @@ namespace DocuAurora.Services.Data
             await this._s3Client.PutObjectAsync(request);
 
             return $"File {prefix}/{file.FileName} uploaded to S3 successfully!";
-
         }
 
         public async Task<bool> DoesS3BucketExistAsync(string bucketName)
@@ -54,17 +47,10 @@ namespace DocuAurora.Services.Data
             return await this._s3Client.DoesS3BucketExistAsync(bucketName);
         }
 
-
-        //public async Task<bool> DeleteFileAsync(string bucketName, string key)
-        //{
-        //    var deleteRequest = new DeleteObjectRequest
-        //    {
-        //        BucketName = bucketName,
-        //        Key = key
-        //    };
-
-        //    var response = await _s3Client.DeleteObjectAsync(deleteRequest);
-        //    return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;
-        //}
+        public async Task<bool> DeleteFileAsync(string bucketName, string key)
+        {
+            var response = await this._s3Client.DeleteObjectAsync(bucketName, key);
+            return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;
+        }
     }
 }
