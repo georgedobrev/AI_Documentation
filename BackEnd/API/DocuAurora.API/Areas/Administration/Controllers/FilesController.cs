@@ -40,7 +40,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
                 return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            return Ok(await this._s3Service.UploadFileAsync(bucketName, file));
+            return Ok(await this._s3Service.UploadFileAsync(bucketName, file, prefix));
         }
 
     }
