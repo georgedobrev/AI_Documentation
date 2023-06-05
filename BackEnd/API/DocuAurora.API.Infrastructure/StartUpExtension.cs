@@ -7,6 +7,7 @@
     using System.Text;
 
     using RabbitMQ.Client;
+    using Amazon.S3;
 
     using DocuAurora.Data;
     using DocuAurora.Data.Common;
@@ -33,6 +34,7 @@
     using MongoDB.Driver;
     using Serilog;
     using System.Threading.Channels;
+    using Amazon.S3;
 
     public static class StartUpExtension
     {
@@ -250,6 +252,19 @@
             return services;
         }
 
+        public static IServiceCollection ConfigureAWSS3Storage(
+                                                      this IServiceCollection services,
+                                                      IConfiguration configuration)
+        {
+            services.AddScoped<S3Service>();
+
+            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+
+            services.AddAWSService<IAmazonS3>();
+
+            return services;
+        }
+
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             // RabittMQ
@@ -257,6 +272,9 @@
 
             // MS SQL DB
             services.ConfigureMSSQLDB(configuration);
+
+            // AWS S3 File Storage
+            services.ConfigureAWSS3Storage(configuration);
 
             // Identity
             services.ConfigureIdentity();
