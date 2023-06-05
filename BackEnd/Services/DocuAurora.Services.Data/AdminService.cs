@@ -19,16 +19,13 @@ namespace DocuAurora.Services.Data
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly ApplicationDbContext _dbContext;
 
         public AdminService(
                             UserManager<ApplicationUser> userManager,
-                            RoleManager<ApplicationRole> roleManager,
-                            ApplicationDbContext dbContext)
+                            RoleManager<ApplicationRole> roleManager)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
-            this._dbContext = dbContext;
         }
 
         public async Task<IEnumerable<string>> FilterRolesThatAreNotAlreadySetAsync(IEnumerable<string> roles, ApplicationUser user)

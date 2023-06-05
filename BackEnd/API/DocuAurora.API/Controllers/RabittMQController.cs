@@ -1,4 +1,6 @@
-﻿using DocuAurora.Services.Data.Contracts;
+﻿using DocuAurora.API.ViewModels;
+using DocuAurora.API.ViewModels.RabittMQ;
+using DocuAurora.Services.Data.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -16,9 +18,9 @@ namespace DocuAurora.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] RabbitMQMessage message)
         {
-            this._rabbitMQService.SendMessage(value);
+            this._rabbitMQService.SendMessage(message);
 
             return Ok();
         }
