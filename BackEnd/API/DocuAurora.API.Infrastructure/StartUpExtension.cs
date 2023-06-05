@@ -65,7 +65,7 @@
         public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
             // Application services
-            services.AddTransient<IEmailSender, NullMessageSender>();
+            services.AddTransient<IEmailSender, SendGridEmailSender>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
