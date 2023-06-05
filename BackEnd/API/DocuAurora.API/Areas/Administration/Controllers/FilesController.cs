@@ -27,7 +27,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             this._s3Service = s3Service;
         }
 
-        // POST api/values
+        // POST api/files
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
@@ -43,5 +43,21 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return Ok(await this._s3Service.UploadFileAsync(bucketName, file, prefix));
         }
 
+        [HttpGet]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get(string bucketName, string key)
+        {
+            var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+                return NotFound($"Bucket {bucketName} does not exist.");
+            }
+
+            var fileForDownload = await this._s3Service.GetFileAsync(bucketName, key);
+
+            return File(fileForDownload.ResponseStream,fileForDownload.Headers.ContentType);
+        }
     }
 }

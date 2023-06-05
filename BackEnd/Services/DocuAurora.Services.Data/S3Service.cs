@@ -21,17 +21,17 @@ namespace DocuAurora.Services.Data
             this._s3Client = s3Client;
         }
 
-        //public async Task<Stream> GetFileAsync(string bucketName, string key)
-        //{
-        //    var request = new GetObjectRequest
-        //    {
-        //        BucketName = bucketName,
-        //        Key = key
-        //    };
+        public async Task<GetObjectResponse> GetFileAsync(string bucketName, string key)
+        {
+            var request = new GetObjectRequest
+            {
+                BucketName = bucketName,
+                Key = key
+            };
 
-        //    var response = await _s3Client.GetObjectAsync(request);
-        //    return response.ResponseStream;
-        //}
+            var response = await this._s3Client.GetObjectAsync(request);
+            return response;
+        }
 
         public async Task<string> UploadFileAsync(string bucketName, IFormFile file, string? prefix)
         {
