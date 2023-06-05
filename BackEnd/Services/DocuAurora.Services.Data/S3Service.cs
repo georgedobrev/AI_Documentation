@@ -49,6 +49,12 @@ namespace DocuAurora.Services.Data
 
         }
 
+        public async Task<bool> DoesS3BucketExistAsync(string bucketName)
+        {
+            return await this._s3Client.DoesS3BucketExistAsync(bucketName);
+        }
+
+
         //public async Task<bool> DeleteFileAsync(string bucketName, string key)
         //{
         //    var deleteRequest = new DeleteObjectRequest

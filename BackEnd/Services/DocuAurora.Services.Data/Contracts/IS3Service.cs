@@ -11,6 +11,8 @@ namespace DocuAurora.Services.Data.Contracts
 
         Task<string> UploadFileAsync(string bucketName, IFormFile file, string? prefix = "DocuAuroraStorage");
 
+        Task<bool> DoesS3BucketExistAsync(string bucketName);
+
         //  Task<bool> DeleteFileAsync(string bucketName, string key);
     }
 }
