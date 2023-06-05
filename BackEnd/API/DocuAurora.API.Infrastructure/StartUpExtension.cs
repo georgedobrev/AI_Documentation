@@ -65,7 +65,10 @@
         public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
             // Application services
-            services.AddTransient<IEmailSender, SendGridEmailSender>();
+            services.AddTransient<IEmailSender, NullMessageSender>();
+            services.AddTransient<IEmailSender>(i =>
+          new SendGridEmailSender(configuration.GetValue<string>("SendGridSettings:SendGridApiKey")));
+            services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
@@ -216,7 +219,7 @@
                 var connectionFactory = new ConnectionFactory
                 {
                     HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName")
-            };
+                };
                 return connectionFactory;
             });
 
