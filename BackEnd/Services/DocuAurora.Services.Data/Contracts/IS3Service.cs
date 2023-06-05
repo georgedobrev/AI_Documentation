@@ -9,7 +9,7 @@ namespace DocuAurora.Services.Data.Contracts
     {
         //  Task<Stream> GetFileAsync(string bucketName, string key);
 
-        Task<string> UploadFileAsync(string bucketName, IFormFile file);
+        Task<string> UploadFileAsync(string bucketName, IFormFile file, string? prefix = "DocuAuroraStorage");
 
         //  Task<bool> DeleteFileAsync(string bucketName, string key);
     }
