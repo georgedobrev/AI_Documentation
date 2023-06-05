@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
+using Amazon.S3.Model;
 using DocuAurora.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,29 +25,26 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             _s3Client = s3Client;
         }
 
-        // GET: api/values
+        // GET: api/files
         [HttpGet]
-        public IEnumerable<string> Get()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get(string bucketName, string? prefix)
         {
-            return new string[] { "value1", "value2" };
+            
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return "value";
+           
         }
 
         // POST api/values
         [HttpPost]
         public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
         {
         }
 
