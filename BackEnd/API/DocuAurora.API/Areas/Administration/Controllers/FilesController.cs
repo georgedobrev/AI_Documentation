@@ -62,7 +62,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         }
 
         // POST api/files
-        [HttpPost]
+        [HttpDelete]
         [ProducesResponseType(204)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
