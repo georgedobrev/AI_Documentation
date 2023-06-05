@@ -57,8 +57,10 @@ namespace DocuAurora.Services.Messaging
         public async Task<bool> SendPasswordResetEmail(string email)
         {
             var user = await this._userManager.FindByEmailAsync(email);
-            if (user == null) return false;
-
+            if (user == null)
+            {
+                return false;
+            }
             var code = await this._userManager.GeneratePasswordResetTokenAsync(user);
             var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user.Id};{code}"));
 
