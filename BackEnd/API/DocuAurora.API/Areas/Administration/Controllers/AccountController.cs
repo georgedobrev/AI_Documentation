@@ -104,7 +104,7 @@ namespace DocuAurora.API.Controllers
                     expiration = token.ValidTo
                 });
             }
-            return Unauthorized();
+            return Unauthorized("Wrong password or username");
         }
 
         [HttpGet]
@@ -157,8 +157,12 @@ namespace DocuAurora.API.Controllers
                     };
 
                     var identityResult = await _userManager.CreateAsync(user);
-
+                    // Check if user creation was successful, otherwise handle error
                 }
+
+                // SignIn the user using SignInManager
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
                 var authClaims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),

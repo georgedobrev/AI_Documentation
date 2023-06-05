@@ -27,12 +27,6 @@ namespace DocuAurora.API.Infrastructure
             {
                 await next(context);
             }
-            catch (UnauthorizedAccessException e)
-            {
-                _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await WriteProblemDetails(context, "Unauthorized", "You are not authorized to access the requested resource.");
-            }
             catch (NotFoundException e)
             {
                 _logger.LogError(e, e.Message);
