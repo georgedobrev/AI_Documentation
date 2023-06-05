@@ -7,10 +7,10 @@ namespace DocuAurora.Services.Data.Contracts
 {
     public interface IS3Service
     {
-        Task<Stream> GetFileAsync(string bucketName, string key);
+        //  Task<Stream> GetFileAsync(string bucketName, string key);
 
         Task<string> UploadFileAsync(string bucketName, IFormFile file);
 
-        Task<bool> DeleteFileAsync(string bucketName, string key);
+        //  Task<bool> DeleteFileAsync(string bucketName, string key);
     }
 }
