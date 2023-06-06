@@ -303,7 +303,7 @@
 
             // HealthChecks
             services.AddHealthChecks()
-                .AddMySql(configuration["ConnectionStrings:DefaultConnection"]);
+                .AddSqlServer(configuration["ConnectionStrings:DefaultConnection"]);
                 //.AddMongoDb(configuration["DocumentStoreDatabaseSettings:ConnectionString"])
         }
     }
