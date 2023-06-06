@@ -6,25 +6,8 @@ import '../Styles/RegisterPageStyles.css';
 import logo from '../assets/DocuAuroraLogo_prev_ui.png';
 import { registerUser } from '../Service/api'; 
 import { GOOGLE_CLIENT_ID } from '../config';
+import { GoogleResponse } from '../Types/types';
 
-
-interface GoogleLoginResponse {
-  profileObj: {
-    email: string;
-    familyName: string;
-    givenName: string;
-    googleId: string;
-    imageUrl: string;
-    name: string;
-  };
-  tokenId: string;
-}
-
-interface GoogleLoginResponseOffline {
-  code: string;
-}
-
-type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
 
 const validationSchema = Yup.object({
     username: Yup.string()

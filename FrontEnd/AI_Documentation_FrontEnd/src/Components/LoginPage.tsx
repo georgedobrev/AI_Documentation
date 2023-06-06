@@ -5,6 +5,7 @@ import '../Styles/LoginPageStyles.css';
 import logo from '../assets/DocuAuroraLogo_prev_ui.png'; 
 import { loginUser } from '../Service/api';  
 import { GOOGLE_CLIENT_ID } from '../config';
+import { GoogleResponse } from '../Types/types';
 
 const validationSchema = Yup.object({
     username: Yup.string()
@@ -19,23 +20,6 @@ const validationSchema = Yup.object({
         .required('Password is required.'),
 });
 
-interface GoogleLoginResponse {
-    profileObj: {
-      email: string;
-      familyName: string;
-      givenName: string;
-      googleId: string;
-      imageUrl: string;
-      name: string;
-    };
-    tokenId: string;
-  }
-
-interface GoogleLoginResponseOffline {
-    code: string;
-}
-
-type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
 
 const responseGoogle = (response: GoogleResponse) => {
     console.log(response);
