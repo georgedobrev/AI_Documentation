@@ -240,8 +240,10 @@
                    arguments: null);
 
                 var routingKey = configuration.GetValue<string>("RabbitMQRoutingKeyConfiguration:RoutingKey");
+                var routingKeyFile = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
 
                 channelCreation.Value.QueueBind(queue, exchange, routingKey);
+                channelCreation.Value.QueueBind(queue, exchange, routingKeyFile);
 
                 return channelCreation.Value;
             });
