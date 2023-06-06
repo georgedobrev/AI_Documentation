@@ -31,7 +31,7 @@ namespace DocuAurora.Services.Data
             {
                 file.CopyTo(memoryStream);
                 byte[] fileContent = memoryStream.ToArray();
-                this.channel.BasicPublish(exchange, routingKey, properties,, body: fileContent);
+                this.channel.BasicPublish(exchange, routingKey, properties, body: fileContent);
             }
         }
 
