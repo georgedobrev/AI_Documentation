@@ -39,12 +39,12 @@ namespace DocuAurora.API.Infrastructure
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await WriteProblemDetails(context, "Bad request", e.Message);
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                await WriteProblemDetails(context, "Server error", "An internal server error occurred.");
-            }
+           // catch (Exception e)
+           // {
+            //    _logger.LogError(e, e.Message);
+            //    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+           //     await WriteProblemDetails(context, "Server error", "An internal server error occurred.");
+           // }
         }
 
         private static async Task WriteProblemDetails(HttpContext context, string title, string detail)

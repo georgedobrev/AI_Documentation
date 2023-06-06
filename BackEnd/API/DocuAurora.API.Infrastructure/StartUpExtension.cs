@@ -35,6 +35,7 @@
     using Serilog;
     using System.Threading.Channels;
     using Amazon.S3;
+    using static System.Net.WebRequestMethods;
 
     public static class StartUpExtension
     {
@@ -299,6 +300,11 @@
 
             // Swagger configuration
             services.ConfigureSwagger();
+
+            // HealthChecks
+            services.AddHealthChecks()
+                .AddMySql(configuration["ConnectionStrings:DefaultConnection"]);
+                //.AddMongoDb(configuration["DocumentStoreDatabaseSettings:ConnectionString"])
         }
     }
 }
