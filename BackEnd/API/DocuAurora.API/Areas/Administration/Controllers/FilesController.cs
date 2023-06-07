@@ -22,10 +22,12 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IS3Service _s3Service;
+        private readonly IRabbitMQService _rabbitMQService;
 
-        public FilesController(IS3Service s3Service)
+        public FilesController(IS3Service s3Service, IRabbitMQService rabbitMQService)
         {
             this._s3Service = s3Service;
+            this._rabbitMQService = rabbitMQService;
         }
 
         [HttpGet]
@@ -58,7 +60,9 @@ namespace DocuAurora.API.Areas.Administration.Controllers
                 return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            return Ok(await this._s3Service.UploadFileAsync(file, bucketName, prefix));
+            var key = await this._s3Service.UploadFileAsync(file, bucketName, prefix);
+
+            return Ok();
         }
 
         // POST api/files

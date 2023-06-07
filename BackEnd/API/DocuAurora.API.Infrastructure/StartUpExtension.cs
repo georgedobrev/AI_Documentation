@@ -35,6 +35,8 @@
     using Serilog;
     using System.Threading.Channels;
     using Amazon.S3;
+    using DocuAurora.API.ViewModels;
+    using DocuAurora.API.ViewModels.RabittMQ;
 
     public static class StartUpExtension
     {
@@ -74,6 +76,7 @@
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
+            services.AddTransient<RabbitMQMessage>();
 
             return services;
         }
