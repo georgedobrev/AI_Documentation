@@ -247,9 +247,11 @@
                    autoDelete: false,
                    arguments: null);
 
-                var routingKey = configuration.GetValue<string>("RabbitMQRoutingKeyConfiguration:RoutingKey");
+                var routingMessageKey = configuration.GetValue<string>("RabbitMQRoutingKeyMessageConfiguration:RoutingKey");
+                var routingFileKey = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
 
-                channelCreation.Value.QueueBind(queue, exchange, routingKey);
+                channelCreation.Value.QueueBind(queue, exchange, routingMessageKey);
+                channelCreation.Value.QueueBind(queue, exchange, routingFileKey);
 
                 return channelCreation.Value;
             });
@@ -264,7 +266,7 @@
                                                       this IServiceCollection services,
                                                       IConfiguration configuration)
         {
-            services.AddScoped<S3Service>();
+            services.AddTransient<IS3Service,S3Service>();
 
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
