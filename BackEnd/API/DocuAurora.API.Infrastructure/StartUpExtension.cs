@@ -76,7 +76,7 @@
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
-            services.AddTransient<RabbitMQMessage>();
+            services.AddTransient<RabbitMQFileKeyMessage>();
 
             return services;
         }
