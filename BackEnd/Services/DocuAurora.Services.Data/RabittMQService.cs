@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -23,8 +24,7 @@ namespace DocuAurora.Services.Data
             this.channel = channel;
         }
 
-
-        public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties = null)
+        public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties)
         {
             var output = JsonSerializer.Serialize(message);
 

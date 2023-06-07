@@ -39,7 +39,7 @@ namespace DocuAurora.Services.Data
 
             await this._s3Client.PutObjectAsync(request);
 
-            return $"File {prefix}/{file.FileName} uploaded to S3 successfully!";
+            return request.Key;
         }
 
         public async Task<bool> DoesS3BucketExistAsync(string bucketName)
