@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@leecheuk/react-google-login": "^5.4.1",
     "@mui/material": "^5.13.2",
+    "axios": "^1.4.0",
     "formik": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
