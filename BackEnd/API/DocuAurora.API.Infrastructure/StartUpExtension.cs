@@ -38,6 +38,9 @@
     using DocuAurora.API.ViewModels;
     using DocuAurora.API.ViewModels.RabittMQ;
 
+    using static System.Net.WebRequestMethods;
+
+
     public static class StartUpExtension
     {
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
@@ -302,6 +305,11 @@
 
             // Swagger configuration
             services.ConfigureSwagger();
+
+            // HealthChecks
+            services.AddHealthChecks()
+                .AddSqlServer(configuration["ConnectionStrings:DefaultConnection"]);
+                //.AddMongoDb(configuration["DocumentStoreDatabaseSettings:ConnectionString"])
         }
     }
 }
