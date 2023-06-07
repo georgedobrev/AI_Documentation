@@ -25,13 +25,5 @@ namespace DocuAurora.API.Controllers
 
             return Ok();
         }
-
-        [HttpPost("SendFile")]
-        public async Task<IActionResult> Post(IFormFile file)
-        {
-            this._rabbitMQService.SendFile(file);
-
-            return Ok();
-        }
     }
 }
