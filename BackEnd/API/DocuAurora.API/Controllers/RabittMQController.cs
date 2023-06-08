@@ -25,5 +25,12 @@ namespace DocuAurora.API.Controllers
 
             return Ok();
         }
+
+        // 1. FileController - Get all documents + bucketname // multitenant - autobucketname
+        // 2. RabbitControler - Get documentNames[] + bucketname
+        //      * Get keys / Use the name (id for the document)
+        //      * Send message bucketname + documentNames[] - json - byte[]
+        //      * CommandName - Embed-Documents / logging 
+        //          p. 
     }
 }
