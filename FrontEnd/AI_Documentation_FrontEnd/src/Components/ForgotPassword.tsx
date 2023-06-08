@@ -20,7 +20,7 @@ function ForgotPasswordPage() {
         onSubmit: async (values) => {
             try {
                 const user = await sendResetPasswordLink(values);
-                console.log(user);
+               
             } catch (error) {
                 console.error(error);
             }
