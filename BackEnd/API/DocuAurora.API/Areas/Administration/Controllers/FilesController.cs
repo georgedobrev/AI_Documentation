@@ -56,25 +56,18 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
         // POST api/files
         [HttpPost]
-        //[ProducesResponseType(200)]
-        //[ProducesResponseType(401)]
-        //[ProducesResponseType(404)]
-        public async Task<IActionResult> Post(IFormFile file)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Post(IFormFile file, string bucketName, string? prefix)
         {
-            var bucketExists = await this._s3Service.DoesS3BucketExistAsync();
+            var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists)
             {
-               return NotFound($"Bucket does not exist.");
+               return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            var key = await this._s3Service.UploadFileAsync(file);
-
-            this._rabbitMQFileKeyMessage.CommandName = "Post";
-            this._rabbitMQFileKeyMessage.Payload = key;
-
-            this._rabbitMQService.SendMessage(this._rabbitMQFileKeyMessage);
-
-            return Ok();
+            return Ok(await this._s3Service.UploadFileAsync(bucketName, prefix, file));
         }
 
         // POST api/files

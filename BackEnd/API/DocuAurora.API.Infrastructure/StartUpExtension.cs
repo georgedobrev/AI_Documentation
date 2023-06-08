@@ -36,12 +36,10 @@
     using System.Threading.Channels;
     using Amazon.S3;
 
-
     using DocuAurora.API.ViewModels;
     using DocuAurora.API.ViewModels.RabittMQ;
 
     using static System.Net.WebRequestMethods;
-
 
     public static class StartUpExtension
     {
@@ -271,9 +269,6 @@
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
             services.AddAWSService<IAmazonS3>();
-
-            
-
 
             return services;
         }
