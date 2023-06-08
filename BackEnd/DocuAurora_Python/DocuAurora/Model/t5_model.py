@@ -1,9 +1,8 @@
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-tokenizer = T5Tokenizer.from_pretrained('t5-base')
-model = T5ForConditionalGeneration.from_pretrained('t5-base')
-
-def generate_summary(text):
-    inputs = tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=512, truncation=True)
-    outputs = model.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+def generate_text(input_text):
+    model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
+    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
+    inputs = tokenizer(input_text, return_tensors="pt")
+    outputs = model.generate(**inputs)
+    return tokenizer.batch_decode(outputs, skip_special_tokens=True)
