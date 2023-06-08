@@ -21,13 +21,13 @@ namespace DocuAurora.Services.Data
             this._s3Client = s3Client;
         }
 
-        public async Task<GetObjectResponse> GetFileAsync(string bucketName, string key)
+        public async Task<GetObjectResponse> GetFileAsync( string key, string bucketName)
         {
             var response = await this._s3Client.GetObjectAsync(bucketName, key);
             return response;
         }
 
-        public async Task<string> UploadFileAsync(string bucketName, IFormFile file, string? prefix)
+        public async Task<string> UploadFileAsync(IFormFile file, string bucketName, string? prefix)
         {
             var request = new PutObjectRequest()
             {
@@ -47,7 +47,7 @@ namespace DocuAurora.Services.Data
             return await this._s3Client.DoesS3BucketExistAsync(bucketName);
         }
 
-        public async Task<bool> DeleteFileAsync(string bucketName, string key)
+        public async Task<bool> DeleteFileAsync(string key, string bucketName)
         {
             var response = await this._s3Client.DeleteObjectAsync(bucketName, key);
             return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;

@@ -8,12 +8,12 @@ namespace DocuAurora.Services.Data.Contracts
 {
     public interface IS3Service
     {
-        Task<GetObjectResponse> GetFileAsync(string bucketName, string key);
+        Task<GetObjectResponse> GetFileAsync(string key, string bucketName = "docu-aurora/Default");
 
-        Task<string> UploadFileAsync(string bucketName, IFormFile file, string? prefix = "DocuAuroraStorage");
+        Task<string> UploadFileAsync(IFormFile file, string bucketName = "docu-aurora/Default",  string? prefix = "DocuAuroraStorage");
 
-        Task<bool> DoesS3BucketExistAsync(string bucketName);
+        Task<bool> DoesS3BucketExistAsync(string bucketName = "docu-aurora/Default");
 
-        Task<bool> DeleteFileAsync(string bucketName, string key);
+        Task<bool> DeleteFileAsync(string key, string bucketName = "docu-aurora/Default");
     }
 }

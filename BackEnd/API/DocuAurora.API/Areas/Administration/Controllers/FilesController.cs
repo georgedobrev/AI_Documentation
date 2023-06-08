@@ -32,7 +32,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Get(string bucketName, string key)
+        public async Task<IActionResult> Get(string key, string bucketName)
         {
             var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists)
@@ -58,7 +58,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
                 return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            return Ok(await this._s3Service.UploadFileAsync(bucketName, file, prefix));
+            return Ok(await this._s3Service.UploadFileAsync(file, bucketName, prefix));
         }
 
         // POST api/files
@@ -66,7 +66,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Delete(string bucketName, string key)
+        public async Task<IActionResult> Delete(string key, string bucketName)
         {
             var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists)
@@ -74,7 +74,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
                 return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            await this._s3Service.DeleteFileAsync(bucketName, key);
+            await this._s3Service.DeleteFileAsync(key, bucketName);
 
             return NoContent();
         }

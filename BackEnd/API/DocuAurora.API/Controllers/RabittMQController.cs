@@ -1,6 +1,7 @@
 ﻿using DocuAurora.API.ViewModels;
 using DocuAurora.API.ViewModels.RabittMQ;
 using DocuAurora.Services.Data.Contracts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
