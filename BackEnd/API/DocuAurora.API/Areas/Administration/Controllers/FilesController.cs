@@ -59,7 +59,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Post([FromBody] IFormFile file, string bucketName, string? prefix)
+        public async Task<IActionResult> Post(IFormFile file, string bucketName, string? prefix)
         {
             var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists)
