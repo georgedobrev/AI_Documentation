@@ -266,12 +266,13 @@
                                                       this IServiceCollection services,
                                                       IConfiguration configuration)
         {
+            services.AddScoped<IS3Service, S3Service>();
 
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
             services.AddAWSService<IAmazonS3>();
 
-            services.AddScoped<S3Service>();
+            
 
 
             return services;
