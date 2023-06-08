@@ -54,6 +54,23 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return File(fileForDownload.ResponseStream, fileForDownload.Headers.ContentType);
         }
 
+        [HttpGet("all")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetAll(string bucketName)
+        {
+            var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+                return NotFound($"Bucket {bucketName} does not exist.");
+            }
+
+            var fileKeys = await this._s3Service.GetAllFilesFromBucket(bucketName);
+
+            return Ok(fileKeys);
+        }
+
         // POST api/files
         [HttpPost]
         [ProducesResponseType(200)]

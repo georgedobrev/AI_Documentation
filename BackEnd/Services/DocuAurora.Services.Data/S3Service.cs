@@ -77,5 +77,29 @@ namespace DocuAurora.Services.Data
             var response = await this._s3Client.DeleteObjectAsync(bucketName, key);
             return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;
         }
+
+        public async Task<List<string>> GetAllFilesFromBucket(string bucketName)
+        {
+            if (string.IsNullOrEmpty(bucketName) || string.IsNullOrWhiteSpace(bucketName))
+            {
+                bucketName = this._configuration["AWSBucketName"];
+            }
+
+            List<string> objectKeys = new List<string>();
+
+            ListObjectsV2Request request = new ListObjectsV2Request
+            {
+                BucketName = bucketName
+            };
+
+            ListObjectsV2Response response = await this._s3Client.ListObjectsV2Async(request);
+
+            foreach (S3Object entry in response.S3Objects)
+            {
+                objectKeys.Add(entry.Key);
+            }
+
+            return objectKeys;
+        }
     }
 }
