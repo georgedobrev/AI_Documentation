@@ -1,15 +1,18 @@
+
 from flask import Flask
-from flask_restful import Api
-from flask import Flask, request, jsonify
-from Model.t5_model import generate_text
+from Services.RabbitMQService import CreateConnectionRabbitMQ
 
 app = Flask(__name__)
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    data = request.get_json()['text']
-    prediction = generate_text(data)
-    return jsonify({'prediction': prediction})
+
 
 if __name__ == '__main__':
+    host_name = 'localhost'
+    exchange_name = 'DocuAurora-Exchange'
+    queue_name = 'DocuAurora-Queue'
+    message_routing_key = 'DocuAurora-api/RabittMQMessage'
+    file_routing_key = 'DocuAurora-api/RabittMQFile'
+
+    rabbitmq_service = CreateConnectionRabbitMQ(host_name, exchange_name, queue_name, message_routing_key, file_routing_key)
+    rabbitmq_service.connect()
     app.run(host='0.0.0.0', port=5000, debug=True)
