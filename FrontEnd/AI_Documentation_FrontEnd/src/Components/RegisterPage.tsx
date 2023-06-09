@@ -2,13 +2,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import GoogleLogin from "@leecheuk/react-google-login";
-import '../Styles/RegisterPageStyles.css';
-import logo from '../assets/DocuAuroraLogo_prev_ui.png';
-import { registerUser } from '../Service/api'; 
-import { GOOGLE_CLIENT_ID } from '../config';
 import { GoogleResponse } from '../Types/types';
+import { registerUser, sendGoogleToken } from '../Service/api'; 
+import { GOOGLE_CLIENT_ID } from '../config';
+import logo from '../assets/DocuAuroraLogo_prev_ui.png';
+import '../Styles/RegisterPageStyles.css';
 
-
+ 
 const validationSchema = Yup.object({
     username: Yup.string()
         .min(2, 'Username is too short - should be 2 chars minimum.')
@@ -24,14 +24,24 @@ const validationSchema = Yup.object({
         .matches(/[+\-*&^]/, 'Password must contain at least one special character (+, -, *, &, ^).')
         .required('Password is required.'),
 });
-
-const responseGoogle = (response: GoogleResponse) => {
+ 
+const responseGoogle = async (response: GoogleResponse) => {
     console.log(response);
-}
-
+ 
+    if ('tokenId' in response) {
+        try {
+ 
+            const data = await sendGoogleToken(response.tokenId);
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+};
+ 
 function RegisterPage() {
     const navigate = useNavigate();
-
+ 
     const formik = useFormik({
         initialValues: {
             username: '',
@@ -49,7 +59,7 @@ function RegisterPage() {
             }
         },
     });
-
+ 
     const renderGoogleLoginButton = () => (
         <GoogleLogin
             clientId={GOOGLE_CLIENT_ID}
@@ -63,7 +73,7 @@ function RegisterPage() {
             )}
         />
     );
-
+ 
     return (
         <div className='App'>
             <div className='register-page'>
@@ -121,5 +131,5 @@ function RegisterPage() {
         </div>
     );
 }
-
+ 
 export default RegisterPage;
