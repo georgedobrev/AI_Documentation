@@ -23,6 +23,14 @@ interface UserResponse {
     email: string;
 }
 
+interface ForgotPasswordData {
+    email: string;
+}
+
+interface ForgotPasswordResponse {
+    message: string;
+}
+
 export const registerUser = async (data: RegisterData): Promise<UserResponse> => {
     const response: AxiosResponse<UserResponse> = await instance.post('/Account/register', data);
     return response.data;
@@ -30,5 +38,10 @@ export const registerUser = async (data: RegisterData): Promise<UserResponse> =>
 
 export const loginUser = async (data: LoginData): Promise<UserResponse> => {
     const response: AxiosResponse<UserResponse> = await instance.post('/Account/login', data);
+    return response.data;
+};
+
+export const sendResetPasswordLink = async (data: ForgotPasswordData): Promise<ForgotPasswordResponse> => {
+    const response: AxiosResponse<ForgotPasswordResponse> = await instance.post('/Account/forgot-password', data);
     return response.data;
 };

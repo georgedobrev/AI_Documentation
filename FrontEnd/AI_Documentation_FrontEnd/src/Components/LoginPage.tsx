@@ -6,6 +6,7 @@ import logo from '../assets/DocuAuroraLogo_prev_ui.png';
 import { loginUser } from '../Service/api';  
 import { GOOGLE_CLIENT_ID } from '../config';
 import { GoogleResponse } from '../Types/types';
+import { Link } from 'react-router-dom';
 
 const validationSchema = Yup.object({
     username: Yup.string()
@@ -88,10 +89,12 @@ function LoginPage() {
                         required
                         className={formik.touched.password && formik.errors.password ? "error-input" : "normal-input"}
                     />
+                    
                     {formik.touched.password && formik.errors.password ? (
                         <div className="error">{formik.errors.password}</div>
                     ) : null}
-                    <button type='submit'>Login</button>
+                    <Link to="/forgot-password" className="forgot-password-link">Forgot password?</Link>
+                    <button type='submit'>Log In</button>
                     <div className='google-login'>
                         {renderGoogleLoginButton()}
                     </div>
@@ -102,4 +105,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
