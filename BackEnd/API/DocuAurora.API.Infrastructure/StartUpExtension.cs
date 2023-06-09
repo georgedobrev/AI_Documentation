@@ -273,6 +273,20 @@
             return services;
         }
 
+        public static void AddCustomCors(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CustomCorsPolicy", builder =>
+                {
+                    var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+                    builder.WithOrigins(allowedOrigins)
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+        }
+
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             // RabittMQ
@@ -283,6 +297,9 @@
 
             // AWS S3 File Storage
             services.ConfigureAWSS3Storage(configuration);
+
+            //CUSTOM CORS
+            services.AddCustomCors(configuration);
 
             // Identity
             services.ConfigureIdentity();
@@ -311,7 +328,7 @@
             // HealthChecks
             services.AddHealthChecks()
                 .AddSqlServer(configuration["ConnectionStrings:DefaultConnection"]);
-                //.AddMongoDb(configuration["DocumentStoreDatabaseSettings:ConnectionString"])
+            //.AddMongoDb(configuration["DocumentStoreDatabaseSettings:ConnectionString"])
         }
     }
 }
