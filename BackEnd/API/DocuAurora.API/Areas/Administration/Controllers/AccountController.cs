@@ -119,65 +119,67 @@ namespace DocuAurora.API.Controllers
             return Redirect(redirectUrl);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GoogleResponse")]
-        public async Task<IActionResult> GoogleResponse(string code)
+        public async Task<IActionResult> GoogleResponse([FromBody] TokenModel tokenModel)
         {
-            using (var client = new HttpClient())
+            using var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token");
+            req.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+
+    {
+        {"code", tokenModel.Token },
+        {"client_id", _configuration["Authentication:Google:ClientId"]},
+        {"client_secret", _configuration["Authentication:Google:ClientSecret"]},
+        {"redirect_uri", _configuration["Authentication:Google:RedirectUri"]},
+        {"grant_type", "authorization_code"}
+    });
+
+            var res = await client.SendAsync(req);
+            var tokenResponse = await res.Content.ReadAsStringAsync();
+
+            var tokenData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenResponse);
+            string idToken = tokenData["id_token"];
+
+            // Parse the id token to get user information
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings());
+
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
             {
-                var req = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token");
-                req.Content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            {"code", code},
-            {"client_id", _configuration["Authentication:Google:ClientId"]},
-            {"client_secret", _configuration["Authentication:Google:ClientSecret"]},
-            {"redirect_uri", _configuration["Authentication:Google:RedirectUri"]},
-            {"grant_type", "authorization_code"}
-        });
-
-                var res = await client.SendAsync(req);
-                var tokenResponse = await res.Content.ReadAsStringAsync();
-
-                var tokenData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenResponse);
-                string idToken = tokenData["id_token"];
-                string accessToken = tokenData["access_token"];
-
-                // Parse the id token to get user information
-                var payload = GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()).Result;
-
-                var user = await _userManager.FindByEmailAsync(payload.Email);
-
-                if (user == null)
+                // User doesn't exist, create a new user
+                user = new ApplicationUser
                 {
-                    // User doesn't exist, create a new user
-                    user = new ApplicationUser
-                    {
-                        UserName = payload.Email,
-                        Email = payload.Email
-                    };
+                    UserName = payload.Email,
+                    Email = payload.Email,
+                };
 
-                    var identityResult = await _userManager.CreateAsync(user);
-                    // Check if user creation was successful, otherwise handle error
-                }
-
-                // SignIn the user using SignInManager
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
-                var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-            // Add more claims as needed
-        };
-                var token = GetToken(authClaims);
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
-                });
+                var identityResult = await _userManager.CreateAsync(user);
+                // Check if user creation was successful, otherwise handle error
             }
 
+            // Link the user with the login
+            var result = await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", payload.Subject, "Google"));
+            if (!result.Succeeded)
+            {
+                // Handle errors
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.Email, user.Email),
+    };
+            var token = GetToken(authClaims);
+
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            });
         }
 
         [HttpPost("Logout")]
