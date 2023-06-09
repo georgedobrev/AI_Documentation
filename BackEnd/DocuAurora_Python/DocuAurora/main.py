@@ -1,15 +1,12 @@
 from flask import Flask
-from flask_restful import Api
-from flask import Flask, request, jsonify
-from Model.t5_model import generate_text
+from Services.RabbitMQService import RabbitMQService
+from config import host_name, exchange_name, queue_name, message_routing_key, file_routing_key
 
 app = Flask(__name__)
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    data = request.get_json()['text']
-    prediction = generate_text(data)
-    return jsonify({'prediction': prediction})
-
 if __name__ == '__main__':
+    rabbitmq_service = RabbitMQService(host_name, exchange_name, queue_name, message_routing_key, file_routing_key)
+    rabbitmq_service.connect()
+    rabbitmq_service.start_consuming()
+
     app.run(host='0.0.0.0', port=5000, debug=True)
