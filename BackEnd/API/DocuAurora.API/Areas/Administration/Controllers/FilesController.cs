@@ -24,17 +24,14 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     {
         private readonly IS3Service _s3Service;
         private readonly IRabbitMQService _rabbitMQService;
-        private readonly RabbitMQFileKeyMessage _rabbitMQFileKeyMessage;
 
         public FilesController(
             IS3Service s3Service,
-            IRabbitMQService rabbitMQService,
-            RabbitMQFileKeyMessage rabbitMQFileKeyMessage
+            IRabbitMQService rabbitMQService
            )
         {
             this._s3Service = s3Service;
             this._rabbitMQService = rabbitMQService;
-            this._rabbitMQFileKeyMessage = rabbitMQFileKeyMessage;
         }
 
         [HttpGet]
