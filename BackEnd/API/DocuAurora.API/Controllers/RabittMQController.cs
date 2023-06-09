@@ -18,8 +18,16 @@ namespace DocuAurora.API.Controllers
             this._rabbitMQService = rabbitMQService;
         }
 
-        [HttpPost]
+        [HttpPost("message")]
         public async Task<IActionResult> Post([FromBody] RabbitMQMessage message)
+        {
+            this._rabbitMQService.SendMessage(message);
+
+            return Ok();
+        }
+
+        [HttpPost("filemessage")]
+        public async Task<IActionResult> Post([FromBody] RabbitMQFileMessage message)
         {
             this._rabbitMQService.SendMessage(message);
 
