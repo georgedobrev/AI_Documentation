@@ -1,6 +1,7 @@
 ﻿using Amazon.S3.Model;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -8,12 +9,15 @@ namespace DocuAurora.Services.Data.Contracts
 {
     public interface IS3Service
     {
-        Task<GetObjectResponse> GetFileAsync(string key, string bucketName = "docu-aurora/Default");
+        Task<GetObjectResponse> GetFileAsync(string bucketName, string key);
 
-        Task<string> UploadFileAsync(IFormFile file, string bucketName = "docu-aurora/Default",  string? prefix = "DocuAuroraStorage");
+        Task<string> UploadFileAsync(string bucketName, string? prefix, IFormFile file);
 
-        Task<bool> DoesS3BucketExistAsync(string bucketName = "docu-aurora/Default");
+        Task<bool> DoesS3BucketExistAsync(string bucketName);
 
-        Task<bool> DeleteFileAsync(string key, string bucketName = "docu-aurora/Default");
+        Task<bool> DeleteFileAsync(string bucketName, string key);
+
+        Task<List<string>> GetAllFilesFromBucket(string bucketName);
+
     }
 }

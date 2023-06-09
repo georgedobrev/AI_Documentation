@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
+using DocuAurora.API.ViewModels.RabittMQ;
 using DocuAurora.Common;
 using DocuAurora.Services.Data.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +23,18 @@ namespace DocuAurora.API.Areas.Administration.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IS3Service _s3Service;
+        private readonly IRabbitMQService _rabbitMQService;
+        private readonly RabbitMQFileKeyMessage _rabbitMQFileKeyMessage;
 
-        public FilesController(IS3Service s3Service)
+        public FilesController(
+            IS3Service s3Service,
+            IRabbitMQService rabbitMQService,
+            RabbitMQFileKeyMessage rabbitMQFileKeyMessage
+           )
         {
             this._s3Service = s3Service;
+            this._rabbitMQService = rabbitMQService;
+            this._rabbitMQFileKeyMessage = rabbitMQFileKeyMessage;
         }
 
         [HttpGet]
@@ -45,12 +54,11 @@ namespace DocuAurora.API.Areas.Administration.Controllers
             return File(fileForDownload.ResponseStream, fileForDownload.Headers.ContentType);
         }
 
-        // POST api/files
-        [HttpPost]
+        [HttpGet("all")]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Post([FromBody] IFormFile file, string bucketName, string? prefix)
+        public async Task<IActionResult> GetAll(string bucketName)
         {
             var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists)
@@ -58,7 +66,25 @@ namespace DocuAurora.API.Areas.Administration.Controllers
                 return NotFound($"Bucket {bucketName} does not exist.");
             }
 
-            return Ok(await this._s3Service.UploadFileAsync(file, bucketName, prefix));
+            var fileKeys = await this._s3Service.GetAllFilesFromBucket(bucketName);
+
+            return Ok(fileKeys);
+        }
+
+        // POST api/files
+        [HttpPost]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Post(IFormFile file, string bucketName, string? prefix)
+        {
+            var bucketExists = await this._s3Service.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+               return NotFound($"Bucket {bucketName} does not exist.");
+            }
+
+            return Ok(await this._s3Service.UploadFileAsync(bucketName, prefix, file));
         }
 
         // POST api/files

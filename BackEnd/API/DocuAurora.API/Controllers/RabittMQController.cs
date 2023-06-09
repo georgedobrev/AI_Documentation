@@ -18,12 +18,27 @@ namespace DocuAurora.API.Controllers
             this._rabbitMQService = rabbitMQService;
         }
 
-        [HttpPost]
+        [HttpPost("message")]
         public async Task<IActionResult> Post([FromBody] RabbitMQMessage message)
         {
             this._rabbitMQService.SendMessage(message);
 
             return Ok();
         }
+
+        [HttpPost("filemessage")]
+        public async Task<IActionResult> Post([FromBody] RabbitMQFileMessage message)
+        {
+            this._rabbitMQService.SendMessage(message);
+
+            return Ok();
+        }
+
+        // 1. FileController - Get all documents + bucketname // multitenant - autobucketname
+        // 2. RabbitControler - Get documentNames[] + bucketname
+        //      * Get keys / Use the name (id for the document)
+        //      * Send message bucketname + documentNames[] - json - byte[]
+        //      * CommandName - Embed-Documents / logging 
+        //          p. 
     }
 }

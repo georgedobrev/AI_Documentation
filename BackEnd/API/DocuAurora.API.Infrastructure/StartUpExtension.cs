@@ -35,6 +35,10 @@
     using Serilog;
     using System.Threading.Channels;
     using Amazon.S3;
+
+    using DocuAurora.API.ViewModels;
+    using DocuAurora.API.ViewModels.RabittMQ;
+
     using static System.Net.WebRequestMethods;
 
     public static class StartUpExtension
@@ -75,6 +79,7 @@
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<AuthService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
+            services.AddTransient<RabbitMQFileKeyMessage>();
 
             return services;
         }
@@ -240,11 +245,11 @@
                    autoDelete: false,
                    arguments: null);
 
-                var routingKey = configuration.GetValue<string>("RabbitMQRoutingKeyMessageConfiguration:RoutingKey");
-                var routingKeyFile = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
+                var routingMessageKey = configuration.GetValue<string>("RabbitMQRoutingKeyMessageConfiguration:RoutingKey");
+                var routingFileKey = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
 
-                channelCreation.Value.QueueBind(queue, exchange, routingKey);
-                channelCreation.Value.QueueBind(queue, exchange, routingKeyFile);
+                channelCreation.Value.QueueBind(queue, exchange, routingMessageKey);
+                channelCreation.Value.QueueBind(queue, exchange, routingFileKey);
 
                 return channelCreation.Value;
             });
@@ -259,7 +264,7 @@
                                                       this IServiceCollection services,
                                                       IConfiguration configuration)
         {
-            services.AddScoped<S3Service>();
+            services.AddScoped<IS3Service, S3Service>();
 
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 

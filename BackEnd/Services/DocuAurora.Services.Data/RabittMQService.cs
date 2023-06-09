@@ -1,20 +1,17 @@
 ﻿using DocuAurora.Services.Data.Configurations;
 using DocuAurora.Services.Data.Contracts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Ude;
 
 namespace DocuAurora.Services.Data
 {
@@ -27,58 +24,7 @@ namespace DocuAurora.Services.Data
             this.channel = channel;
         }
 
-        public void SendFile(IFormFile file, string queue, string exchange, string routingKey, IBasicProperties properties)
-        {
-
-            using (var compressedStream = new MemoryStream())
-            {
-                using (var fileStream = file.OpenReadStream())
-
-                // Compress the file
-                using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Compress, leaveOpen: true))
-                {
-                    fileStream.CopyTo(gzipStream);
-                }
-
-                // Reset the stream position to the beginning
-                compressedStream.Position = 0;
-
-                 this.channel.BasicPublish(exchange, routingKey, properties, compressedStream.ToArray());
-
-            }
-
-
-
-
-            //var encoding = DetectEncoding(file);
-
-            //using (var memoryStream = new MemoryStream())
-            //{
-            //    file.CopyTo(memoryStream);
-            //    byte[] fileContent = memoryStream.ToArray();
-            //    string fb = string.Join(" ", fileContent);
-            //    var output = JsonSerializer.Serialize(new { encoding, fb});
-            //    this.channel.BasicPublish(exchange, routingKey, properties, Encoding.UTF8.GetBytes(output));
-
-            //}
-        }
-
-        public string DetectEncoding(IFormFile file)
-        {
-            using (var reader = new StreamReader(file.OpenReadStream()))
-            {
-                var detector = new CharsetDetector();
-                detector.Feed(reader.BaseStream);
-                detector.DataEnd();
-                if (detector.Charset != null)
-                {
-                    return detector.Charset;
-                }
-            }
-
-            return "Unknown";
-        }
-            public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties)
+        public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties)
         {
             var output = JsonSerializer.Serialize(message);
 
