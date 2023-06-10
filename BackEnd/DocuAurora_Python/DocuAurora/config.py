@@ -1,5 +1,0 @@
-host_name = 'localhost'
-exchange_name = 'DocuAurora-Exchange'
-queue_name = 'DocuAurora-Queue'
-message_routing_key = 'DocuAurora-api/RabittMQMessage'
-file_routing_key = 'DocuAurora-api/RabittMQFile'
