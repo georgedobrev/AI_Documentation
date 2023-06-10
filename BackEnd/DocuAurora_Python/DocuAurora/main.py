@@ -13,4 +13,10 @@ if __name__ == '__main__':
     # s3_service = S3Service(region_name)
     # s3_service.process_files(bucket_name, object_keys, program_path)
 
+    # TO DO connect this logic T5 tokenizer
+    # embedding_service = T5EmbeddingService()
+    # document_text = "Your document text here"
+    # embedding = embedding_service.get_document_embedding(document_text)
+    # print(embedding)
+
     app.run(host='0.0.0.0', port=5000, debug=True)
