@@ -377,3 +377,4 @@ appsettings.Development
 
 # Removing config python
 config.py
+BackEnd/DocuAurora_Python/DocuAurora/config.ini
