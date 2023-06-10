@@ -1,17 +1,21 @@
 import pika
-
+import configparser
 
 class RabbitMQService:
-    def __init__(self, host_name, exchange_name, queue_name, message_routing_key, file_routing_key):
-        # Initialize any dependencies or resources required by the service
-        self.host_name = host_name
-        self.exchange_name = exchange_name
-        self.queue_name = queue_name
-        self.message_routing_key = message_routing_key
-        self.file_routing_key = file_routing_key
+    def __init__(self, config_file):
+        self.config_file = config_file
+        self.host_name = self._get_config_value('RabbitMQ', 'host_name')
+        self.exchange_name = self._get_config_value('RabbitMQ', 'exchange_name')
+        self.queue_name = self._get_config_value('RabbitMQ', 'queue_name')
+        self.message_routing_key = self._get_config_value('RabbitMQ', 'message_routing_key')
+        self.file_routing_key = self._get_config_value('RabbitMQ', 'file_routing_key')
         self.connection = None
         self.channel = None
-        pass
+
+    def _get_config_value(self, section, key):
+        config = configparser.ConfigParser()
+        config.read(self.config_file)
+        return config.get(section, key)
 
     def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host_name))
@@ -24,7 +28,6 @@ class RabbitMQService:
     def start_consuming(self):
         def callback(ch, method, properties, body):
             print(" [x] Received %r" % body)
-
 
         self.channel.basic_consume(
             queue=self.queue_name,
