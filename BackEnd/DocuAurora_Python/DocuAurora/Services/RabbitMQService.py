@@ -1,5 +1,6 @@
 import pika
 import configparser
+import json
 
 class RabbitMQService:
     def __init__(self, config_file):
@@ -27,7 +28,19 @@ class RabbitMQService:
 
     def start_consuming(self):
         def callback(ch, method, properties, body):
-            print(" [x] Received %r" % body)
+            routing_key = method.routing_key
+            if routing_key == self.file_routing_key:
+                data = json.loads(body.decode())
+                command_name = data['BucketName']
+                file_key = data['DocumentNames']
+                print(
+                    f'Hello Admin, we received your message => {data} commandName => {command_name} file_key => {file_key}')
+            elif routing_key == self.message_routing_key:
+                data = json.loads(body.decode())
+                command_name = data['CommandName']
+                input_question = data['Payload']['InputQuestion']
+                print(
+                    f'Hello Admin, we received your message => {data} commandName => {command_name} input_question => {input_question}')
 
         self.channel.basic_consume(
             queue=self.queue_name,
