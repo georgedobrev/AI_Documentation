@@ -9,4 +9,8 @@ if __name__ == '__main__':
     rabbitmq_service.connect()
     rabbitmq_service.start_consuming()
 
+    # TO DO put this logic in rabittmq when receive msg to send file to model and import s3SERVICE !!!
+    # s3_service = S3Service(region_name)
+    # s3_service.process_files(bucket_name, object_keys, program_path)
+
     app.run(host='0.0.0.0', port=5000, debug=True)
