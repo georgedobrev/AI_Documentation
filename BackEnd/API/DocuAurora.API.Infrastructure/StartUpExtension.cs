@@ -233,12 +233,19 @@
                 var channelCreation = new Lazy<IModel>(() => connectionCreation.Value.CreateModel());
 
                 var exchange = configuration.GetValue<string>("RabbitMQExchangeConfiguration:Exchange");
-                var queue = configuration.GetValue<string>("RabbitMQQueueConfiguration:Queue");
+                var queueMessage = configuration.GetValue<string>("RabbitMQMessageQueueConfiguration:Queue");
+                var queueFile = configuration.GetValue<string>("RabbitMQFileQueueConfiguration:Queue");
 
                 channelCreation.Value.ExchangeDeclare(exchange, ExchangeType.Direct);
 
                 channelCreation.Value.QueueDeclare(
-                   queue,
+                   queueMessage,
+                   durable: false,
+                   exclusive: false,
+                   autoDelete: false,
+                   arguments: null);
+                channelCreation.Value.QueueDeclare(
+                   queueFile,
                    durable: false,
                    exclusive: false,
                    autoDelete: false,
@@ -247,8 +254,8 @@
                 var routingMessageKey = configuration.GetValue<string>("RabbitMQRoutingKeyMessageConfiguration:RoutingKey");
                 var routingFileKey = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
 
-                channelCreation.Value.QueueBind(queue, exchange, routingMessageKey);
-                channelCreation.Value.QueueBind(queue, exchange, routingFileKey);
+                channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
+                channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
 
                 return channelCreation.Value;
             });

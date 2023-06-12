@@ -10,6 +10,6 @@ namespace DocuAurora.Services.Data.Contracts
 {
     public interface IRabbitMQService
     {
-        public void SendMessage<T>(T message, string queue = "DocuAurora-Queue", string exchange = "DocuAurora-Exchange", string routingKey = "DocuAurora-api/RabittMQMessage", IBasicProperties properties = null);
+        public void SendMessage<T>(T message, string queue, string routingKey, string exchange = "DocuAurora-Exchange",  IBasicProperties properties = null);
     }
 }

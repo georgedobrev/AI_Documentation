@@ -24,7 +24,7 @@ namespace DocuAurora.Services.Data
             this.channel = channel;
         }
 
-        public void SendMessage<T>(T message, string queue, string exchange, string routingKey, IBasicProperties properties)
+        public void SendMessage<T>(T message, string queue, string routingKey, string exchange, IBasicProperties properties)
         {
             var output = JsonSerializer.Serialize(message);
 
