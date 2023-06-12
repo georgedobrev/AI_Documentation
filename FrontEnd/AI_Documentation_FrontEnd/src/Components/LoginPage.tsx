@@ -47,7 +47,7 @@ function LoginPage() {
     onSubmit: async (values) => {
       try {
         const user = await loginUser(values);
-        console.log(user);
+        //todo
       } catch (error) {
         console.error(error);
       }
