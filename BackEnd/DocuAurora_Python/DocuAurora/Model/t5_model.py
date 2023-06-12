@@ -1,6 +1,16 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
-tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
-inputs = tokenizer("A step by step recipe to make bolognese pasta:", return_tensors="pt")
-outputs = model.generate(**inputs)
-print(tokenizer.batch_decode(outputs, skip_special_tokens=True))
+from langchain.llms import HuggingFacePipeline
+import torch
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, AutoModelForCausalLM, pipeline
+model_id = 'google/flan-t5-base'
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
+
+pipe = pipeline(
+    "text2text-generation",
+    model=model,
+    tokenizer=tokenizer
+)
+
+local_llm = HuggingFacePipeline(pipeline=pipe)
+
+print(local_llm('translate English to German:How old are you'))
