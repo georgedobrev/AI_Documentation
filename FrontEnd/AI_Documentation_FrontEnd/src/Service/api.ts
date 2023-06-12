@@ -47,8 +47,7 @@ export const sendResetPasswordLink = async (data: ForgotPasswordData): Promise<F
 };
  
 export const sendGoogleToken = async (tokenId: string) => {
-    const response = await axios.post(`${BASE_URL}/api/Account/GoogleResponse`, {
-        tokenId: tokenId,
-    });
+    const response = await axios.post(`${BASE_URL}/api/Account/GoogleResponse`, { tokenId });
+
     return response.data;
 };
