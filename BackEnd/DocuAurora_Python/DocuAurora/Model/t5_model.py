@@ -13,4 +13,4 @@ pipe = pipeline(
 
 local_llm = HuggingFacePipeline(pipeline=pipe)
 
-print(local_llm('translate English to German:How old are you'))
+# print(local_llm('translate English to German:How old are you'))

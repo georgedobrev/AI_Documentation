@@ -40,6 +40,8 @@
     using DocuAurora.API.ViewModels.RabittMQ;
 
     using static System.Net.WebRequestMethods;
+    using MongoDB.Driver.Core.Bindings;
+    using RabbitMQ.Client.Events;
 
     public static class StartUpExtension
     {
@@ -256,6 +258,7 @@
 
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
+
 
                 return channelCreation.Value;
             });

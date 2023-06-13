@@ -45,6 +45,8 @@ if __name__ == '__main__':
     # document_text = "Your document text here"
     # embedding = embedding_service.get_document_embedding(document_text)
     # print(embedding)
+    # var ime = local_llm('What is the capital of France')
+    # var ime
     # print(local_llm('What is the capital of France')) # to do input message
     app.run(host='0.0.0.0', port=5000, debug=True)
 
