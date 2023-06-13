@@ -13,9 +13,9 @@ def callbackMessage(ch, method, properties, body):
         print(answer)
         response_data = {
                 'CommandName': command_name,
-                'payload': {
-                        'inputQuestion': input_question,
-                        'answer': answer
+                'Payload': {
+                        'InputQuestion': input_question,
+                        'Answer': answer
                 }
         }
         response_body = json.dumps(response_data)
@@ -23,3 +23,4 @@ def callbackMessage(ch, method, properties, body):
 
         ch.basic_publish(exchange='DocuAurora-Exchange', routing_key=routing_key, body=response_body)
         print('Published answer:', response_body)
+
