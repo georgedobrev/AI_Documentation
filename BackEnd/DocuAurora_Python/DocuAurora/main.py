@@ -5,8 +5,8 @@ from flask import Flask
 
 from Services.RabbitMQService import RabbitMQService
 
-from Services.RabbitMQMessageConsume import callbackMessage
 from Services.RabbitMQFileConsume import callbackFile
+from Services.RabbitMQMessageConsume import callbackMessage
 
 
 # from Model.t5_model import local_llm
@@ -20,13 +20,19 @@ if __name__ == '__main__':
     config_file = script_dir / "config.ini"
     rabbitmq_service = RabbitMQService()
     rabbitmq_service.connect()
-    rabbitmq_service.create_queues('queue1', 'queue2')
+    queue1_name = 'DocuAurora-Message-Queue'
+    queue2_name = 'DocuAurora-File-Queue'
+    queue_callbacks = {
+        queue1_name: callbackMessage,
+        queue2_name: callbackFile
+    }
 
-    # Start consuming messages from queue 1
-    rabbitmq_service.consume_messages('queue1', callbackMessage)
+    exchange_name = 'DocuAurora-Exchange'
+    routing_key1 = 'DocuAurora-api/RabittMQMessage'
+    routing_key2 = 'DocuAurora-api/RabittMQFile'
+    rabbitmq_service.create_queues(queue1_name, queue2_name, exchange_name, routing_key1, routing_key2)
 
-    # Start consuming messages from queue 2
-    rabbitmq_service.consume_messages('queue2', callbackFile)
+    rabbitmq_service.consume_messages(queue_callbacks)
 
     # Close the connection
     # rabbitmq_service.close_connection()
