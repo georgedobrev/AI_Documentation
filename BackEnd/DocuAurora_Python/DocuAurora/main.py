@@ -16,22 +16,21 @@ app = Flask(__name__)
 if __name__ == '__main__':
     script_dir = Path(__file__).resolve().parent
 
-    # Construct the path to the config file relative to the script's location
     config_file = script_dir / "config.ini"
+
     rabbitmq_service = RabbitMQService(config_file)
     rabbitmq_service.connect()
+    #to optimize this part!
     queue1_name = 'DocuAurora-Message-Queue'
     queue2_name = 'DocuAurora-File-Queue'
+
+    #queue/callback container
     queue_callbacks = {
         queue1_name: callbackMessage,
         queue2_name: callbackFile
     }
 
-    # exchange_name = 'DocuAurora-Exchange'
-    # routing_key1 = 'DocuAurora-api/RabittMQMessage'
-    # routing_key2 = 'DocuAurora-api/RabittMQFile'
     rabbitmq_service.create_queues()
-
     rabbitmq_service.consume_messages(queue_callbacks)
 
     # Close the connection
