@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Construct the path to the config file relative to the script's location
     config_file = script_dir / "config.ini"
-    rabbitmq_service = RabbitMQService()
+    rabbitmq_service = RabbitMQService(config_file)
     rabbitmq_service.connect()
     queue1_name = 'DocuAurora-Message-Queue'
     queue2_name = 'DocuAurora-File-Queue'
@@ -27,10 +27,10 @@ if __name__ == '__main__':
         queue2_name: callbackFile
     }
 
-    exchange_name = 'DocuAurora-Exchange'
-    routing_key1 = 'DocuAurora-api/RabittMQMessage'
-    routing_key2 = 'DocuAurora-api/RabittMQFile'
-    rabbitmq_service.create_queues(queue1_name, queue2_name, exchange_name, routing_key1, routing_key2)
+    # exchange_name = 'DocuAurora-Exchange'
+    # routing_key1 = 'DocuAurora-api/RabittMQMessage'
+    # routing_key2 = 'DocuAurora-api/RabittMQFile'
+    rabbitmq_service.create_queues()
 
     rabbitmq_service.consume_messages(queue_callbacks)
 
