@@ -1,17 +1,19 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import "../Styles/ForgotPasswordStyles.css";
-import logo from "../assets/DocuAuroraLogo_prev_ui.png";
-import { sendResetPasswordLink } from "../Service/api";
-import "../Styles/global.css";
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/DocuAuroraLogo_prev_ui.png";
+import "../../Styles/ResetPasswordPageStyles.css";
+import { resetPassword } from "../../Service/api";
 
 const validationSchema = Yup.object({
   email: Yup.string()
-    .email("Invalid email address.")
+    .email("Invalid email address")
     .required("Email is required."),
 });
 
-function ForgotPasswordPage() {
+function ResetPasswordPage() {
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -19,8 +21,8 @@ function ForgotPasswordPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const user = await sendResetPasswordLink(values);
-        //todo
+        const user = await resetPassword(values.email);
+        navigate("/login");
       } catch (error) {
         console.error(error);
       }
@@ -29,10 +31,10 @@ function ForgotPasswordPage() {
 
   return (
     <div className="App">
-      <div className="login-page">
-        <form onSubmit={formik.handleSubmit} className="login-form">
+      <div className="reset-password-page">
+        <form onSubmit={formik.handleSubmit} className="reset-password-form">
           <img src={logo} alt="Logo" className="logo" />
-          <h2>Forgot Password</h2>
+          <h2>Reset Password</h2>
           <input
             type="email"
             id="email"
@@ -51,11 +53,11 @@ function ForgotPasswordPage() {
           {formik.touched.email && formik.errors.email ? (
             <div className="error">{formik.errors.email}</div>
           ) : null}
-          <button type="submit">Send Reset Link</button>
+          <button type="submit">Send reset link</button>
         </form>
       </div>
     </div>
   );
 }
 
-export default ForgotPasswordPage;
+export default ResetPasswordPage;
