@@ -263,7 +263,7 @@
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
 
-                var replyQueue = channelCreation.Value.QueueDeclare("response", exclusive: false);
+                var replyQueue = channelCreation.Value.QueueDeclare("response", exclusive: true);
 
                 var consumer = new EventingBasicConsumer(channelCreation.Value);
                 consumer.Received += (model, ea) =>
