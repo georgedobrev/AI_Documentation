@@ -30,6 +30,7 @@ pipe = pipeline(
 
 local_llm = HuggingFacePipeline(pipeline=pipe)
 
+
 loader = PyPDFLoader('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
 
 documents = loader.load_and_split()

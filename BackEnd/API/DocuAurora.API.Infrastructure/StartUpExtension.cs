@@ -40,6 +40,8 @@
     using DocuAurora.API.ViewModels.RabittMQ;
 
     using static System.Net.WebRequestMethods;
+    using MongoDB.Driver.Core.Bindings;
+    using RabbitMQ.Client.Events;
 
     public static class StartUpExtension
     {
@@ -221,6 +223,10 @@
                 var connectionFactory = new ConnectionFactory
                 {
                     HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName"),
+                    ClientProperties = new Dictionary<string, object>
+                    {
+                        { "direct_reply_to", true },
+                    }
                 };
                 return connectionFactory;
             });
@@ -233,12 +239,19 @@
                 var channelCreation = new Lazy<IModel>(() => connectionCreation.Value.CreateModel());
 
                 var exchange = configuration.GetValue<string>("RabbitMQExchangeConfiguration:Exchange");
-                var queue = configuration.GetValue<string>("RabbitMQQueueConfiguration:Queue");
+                var queueMessage = configuration.GetValue<string>("RabbitMQMessageQueueConfiguration:Queue");
+                var queueFile = configuration.GetValue<string>("RabbitMQFileQueueConfiguration:Queue");
 
                 channelCreation.Value.ExchangeDeclare(exchange, ExchangeType.Direct);
 
                 channelCreation.Value.QueueDeclare(
-                   queue,
+                   queueMessage,
+                   durable: false,
+                   exclusive: false,
+                   autoDelete: false,
+                   arguments: null);
+                channelCreation.Value.QueueDeclare(
+                   queueFile,
                    durable: false,
                    exclusive: false,
                    autoDelete: false,
@@ -247,8 +260,21 @@
                 var routingMessageKey = configuration.GetValue<string>("RabbitMQRoutingKeyMessageConfiguration:RoutingKey");
                 var routingFileKey = configuration.GetValue<string>("RabbitMQRoutingKeyFileConfiguration:RoutingKey");
 
-                channelCreation.Value.QueueBind(queue, exchange, routingMessageKey);
-                channelCreation.Value.QueueBind(queue, exchange, routingFileKey);
+                channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
+                channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
+
+                var replyQueue = channelCreation.Value.QueueDeclare("response", exclusive: false);
+
+                var consumer = new EventingBasicConsumer(channelCreation.Value);
+                consumer.Received += (model, ea) =>
+                {
+                    var body = ea.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    
+                    Console.WriteLine("Reply received message: {0}", message);
+                };
+
+                channelCreation.Value.BasicConsume(queue: replyQueue.QueueName, autoAck: true, consumer: consumer);
 
                 return channelCreation.Value;
             });
