@@ -19,8 +19,6 @@ def callbackMessage(ch, method, properties, body):
                 }
         }
         response_body = json.dumps(response_data)
-        routing_key = 'DocuAurora-api/RabittMQMessage'  # Specify the routing key for the response queue
-
-        ch.basic_publish(exchange='', routing_key=routing_key, body=response_body)
+        ch.basic_publish('', routing_key=properties.reply_to, body=response_body)
         print('Published answer:', response_body)
 

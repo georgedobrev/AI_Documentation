@@ -223,6 +223,10 @@
                 var connectionFactory = new ConnectionFactory
                 {
                     HostName = configuration.GetValue<string>("RabbitMQHostConfiguration:HostName"),
+                    ClientProperties = new Dictionary<string, object>
+                    {
+                        { "direct_reply_to", true },
+                    }
                 };
                 return connectionFactory;
             });
@@ -259,6 +263,18 @@
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
 
+                var replyQueue = channelCreation.Value.QueueDeclare("response", exclusive: false);
+
+                var consumer = new EventingBasicConsumer(channelCreation.Value);
+                consumer.Received += (model, ea) =>
+                {
+                    var body = ea.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    
+                    Console.WriteLine("Reply received message: {0}", message);
+                };
+
+                channelCreation.Value.BasicConsume(queue: replyQueue.QueueName, autoAck: true, consumer: consumer);
 
                 return channelCreation.Value;
             });

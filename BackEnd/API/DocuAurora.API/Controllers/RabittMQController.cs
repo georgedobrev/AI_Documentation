@@ -27,9 +27,9 @@ namespace DocuAurora.API.Controllers
         public async Task<IActionResult> Post([FromBody] RabbitMQMessage message)
         {
             this._rabbitMQService.SendMessage(message, this._configuration["RabbitMQMessageQueueConfiguration:Queue"], this._configuration["RabbitMQRoutingKeyMessageConfiguration:RoutingKey"]);
-            var response = await this._rabbitMQService.ReceiveResponse(this._configuration["RabbitMQMessageQueueConfiguration:Queue"]);
+         //   var response = await this._rabbitMQService.ReceiveResponse(this._configuration["RabbitMQMessageQueueConfiguration:Queue"]);
 
-            return Ok(response);
+            return Ok();
         }
 
         [HttpPost("filemessage")]
