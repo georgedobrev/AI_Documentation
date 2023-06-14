@@ -57,7 +57,6 @@ namespace DocuAurora.Services.Data
 
             properties = this.channel.CreateBasicProperties();
             properties.ReplyTo = "response";
-            properties.CorrelationId = Guid.NewGuid().ToString();
 
             this.channel.BasicPublish(exchange, routingKey, properties, Encoding.UTF8.GetBytes(output));
         }
