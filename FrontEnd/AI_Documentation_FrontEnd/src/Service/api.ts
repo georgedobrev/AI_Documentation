@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-const BASE_URL = "https://localhost:5001/api"; 
+const BASE_URL = "https://localhost:43658/api"; 
 
 const instance = axios.create({
     baseURL: BASE_URL,
@@ -45,3 +45,17 @@ export const sendResetPasswordLink = async (data: ForgotPasswordData): Promise<F
     const response: AxiosResponse<ForgotPasswordResponse> = await instance.post('/Account/forgot-password', data);
     return response.data;
 };
+ 
+export const sendGoogleToken = async (tokenId: string) => {
+    const response = await axios.post(`${BASE_URL}/api/Account/GoogleResponse`, { tokenId });
+
+    return response.data;
+};
+
+export const resetPassword = async (email: string) => {
+    const response = await axios.post("/api/Account/ResetPassword", { email });
+    if (response.status !== 200) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    return response.data;
+  };

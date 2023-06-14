@@ -3,6 +3,7 @@ using DocuAurora.API.ViewModels.RabittMQ;
 using DocuAurora.Services.Data.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
 namespace DocuAurora.API.Controllers
@@ -12,10 +13,14 @@ namespace DocuAurora.API.Controllers
     public class RabittMQController : ControllerBase
     {
         private readonly IRabbitMQService _rabbitMQService;
+        private readonly IConfiguration _configuration;
 
-        public RabittMQController(IRabbitMQService rabbitMQService)
+        public RabittMQController(
+            IRabbitMQService rabbitMQService,
+            IConfiguration configuration)
         {
             this._rabbitMQService = rabbitMQService;
+            this._configuration = configuration;
         }
 
         [HttpPost("message")]
@@ -29,7 +34,7 @@ namespace DocuAurora.API.Controllers
         [HttpPost("filemessage")]
         public async Task<IActionResult> Post([FromBody] RabbitMQFileMessage message)
         {
-            this._rabbitMQService.SendMessage(message);
+            this._rabbitMQService.SendMessage(message,routingKey: this._configuration["RabbitMQRoutingKeyFileConfiguration:RoutingKey"]);
 
             return Ok();
         }
