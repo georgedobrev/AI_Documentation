@@ -1,12 +1,29 @@
-from flask import request
-from flask_restful import Resource
+from langchain.document_loaders import DirectoryLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores.pinecone import Pinecone
+from langchain.document_loaders import PyPDFLoader
 
-class TextProcessor(Resource):
-    def get(self):
-        return {'message': 'Hello team'}
+from pathlib import Path
+import pinecone
+import asyncio
 
-    def post(self):
-        data = request.get_json()
-        text = data['hello team']
-        print(text)
-        return {'message': 'Text processed successfully'}, 200
+PINECONE_INDEX_NAME = "<Your_Pinecone_Index_Name>"
+PINECONE_NAME_SPACE = "<Your_Pinecone_Namespace>"
+
+async def run():
+    
+    # Load raw documents from all files in the directory
+   
+        loader = PyPDFLoader("your_document.pdf")
+        documents = loader.load_and_split()
+
+        # Split text into chunks
+        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+
+        chunks = text_splitter.split_documents(documents)
+
+        embeddings = HuggingFaceEmbeddings(model, tokenizer)
+
+
+
