@@ -2,6 +2,7 @@
 using DocuAurora.Services.Data.Contracts;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +23,32 @@ namespace DocuAurora.Services.Data
         public RabittMQService(IModel channel)
         {
             this.channel = channel;
+        }
+
+        public async Task<string> ReceiveResponse(string queue, IBasicProperties properties = null)
+        {
+            var consumer = new EventingBasicConsumer(this.channel);
+            var tcs = new TaskCompletionSource<string>();
+
+            consumer.Received += (model, ea) =>
+            {
+                var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+                tcs.TrySetResult(response);
+            };
+
+            this.channel.BasicConsume(queue, autoAck: true, consumer);
+
+            // Wait for the response or a timeout
+            var responseTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30)));
+
+            if (responseTask == tcs.Task)
+            {
+                return tcs.Task.Result;
+            }
+            else
+            {
+                throw new TimeoutException("No response received from RabbitMQ.");
+            }
         }
 
         public void SendMessage<T>(T message, string queue, string routingKey, string exchange, IBasicProperties properties)
