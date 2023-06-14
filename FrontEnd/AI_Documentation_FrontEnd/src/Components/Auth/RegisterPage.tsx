@@ -1,19 +1,21 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 import GoogleLogin from "@leecheuk/react-google-login";
-import "../Styles/LoginPageStyles.css";
-import logo from "../assets/DocuAuroraLogo_prev_ui.png";
-import { loginUser } from "../Service/api";
-import { sendGoogleToken } from "../Service/api";
-import { GOOGLE_CLIENT_ID } from "../config";
-import { GoogleResponse } from "../Types/types";
-import { Link } from "react-router-dom";
+import { GoogleResponse } from "../../Types/types";
+import { registerUser, sendGoogleToken } from "../../Service/api";
+import { GOOGLE_CLIENT_ID } from "../../config";
+import logo from "../../assets/DocuAuroraLogo_prev_ui.png";
+import "../../Styles/RegisterPageStyles.css";
 
 const validationSchema = Yup.object({
   username: Yup.string()
     .min(2, "Username is too short - should be 2 chars minimum.")
     .max(20, "Username is too long - should be 20 chars maximum.")
     .required("Username is required."),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required."),
   password: Yup.string()
     .min(8, "Password is too short - should be 8 chars minimum.")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
@@ -26,28 +28,33 @@ const validationSchema = Yup.object({
 });
 
 const responseGoogle = async (response: GoogleResponse) => {
+  //todo
+
   if ("tokenId" in response) {
     try {
       const data = await sendGoogleToken(response.tokenId);
+      //todo
     } catch (error) {
       console.error(error);
     }
-  } else {
-    //todo
   }
 };
 
-function LoginPage() {
+function RegisterPage() {
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       username: "",
+      email: "",
       password: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const user = await loginUser(values);
+        const user = await registerUser(values);
         //todo
+        navigate("/login");
       } catch (error) {
         console.error(error);
       }
@@ -59,7 +66,6 @@ function LoginPage() {
       clientId={GOOGLE_CLIENT_ID}
       onSuccess={responseGoogle}
       onFailure={responseGoogle}
-      cookiePolicy={"single_host_origin"}
       render={(renderProps) => (
         <button onClick={renderProps.onClick} disabled={renderProps.disabled}>
           <img
@@ -67,7 +73,7 @@ function LoginPage() {
             alt="Google logo"
             width="20"
           />
-          <span>Sign in with Google</span>
+          <span>Sign up with Google</span>
         </button>
       )}
     />
@@ -75,10 +81,10 @@ function LoginPage() {
 
   return (
     <div className="App">
-      <div className="login-page">
-        <form onSubmit={formik.handleSubmit} className="login-form">
+      <div className="register-page">
+        <form onSubmit={formik.handleSubmit} className="register-form">
           <img src={logo} alt="Logo" className="logo" />
-          <h2>Login</h2>
+          <h2>Register</h2>
           <input
             type="text"
             id="username"
@@ -98,6 +104,24 @@ function LoginPage() {
             <div className="error">{formik.errors.username}</div>
           ) : null}
           <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+            className={
+              formik.touched.email && formik.errors.email
+                ? "error-input"
+                : "normal-input"
+            }
+          />
+          {formik.touched.email && formik.errors.email ? (
+            <div className="error">{formik.errors.email}</div>
+          ) : null}
+          <input
             type="password"
             id="password"
             name="password"
@@ -112,14 +136,10 @@ function LoginPage() {
                 : "normal-input"
             }
           />
-
           {formik.touched.password && formik.errors.password ? (
             <div className="error">{formik.errors.password}</div>
           ) : null}
-          <Link to="/forgot-password" className="forgot-password-link">
-            Forgot password?
-          </Link>
-          <button type="submit">Log In</button>
+          <button type="submit">Register</button>
           <div className="google-login">{renderGoogleLoginButton()}</div>
         </form>
       </div>
@@ -127,4 +147,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

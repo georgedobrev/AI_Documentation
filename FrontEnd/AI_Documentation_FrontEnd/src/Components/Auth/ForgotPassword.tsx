@@ -1,9 +1,9 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import "../Styles/ForgotPasswordStyles.css";
-import logo from "../assets/DocuAuroraLogo_prev_ui.png";
-import { sendResetPasswordLink } from "../Service/api";
-import "../Styles/global.css";
+import "../../Styles/ForgotPasswordStyles.css";
+import logo from "../../assets/DocuAuroraLogo_prev_ui.png";
+import { sendResetPasswordLink } from "../../Service/api";
+import "../../Styles/global.css";
 
 const validationSchema = Yup.object({
   email: Yup.string()

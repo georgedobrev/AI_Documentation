@@ -1,9 +1,9 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/DocuAuroraLogo_prev_ui.png";
-import "../Styles/ResetPasswordPageStyles.css";
-import { resetPassword } from "../Service/api";
+import logo from "../../assets/DocuAuroraLogo_prev_ui.png";
+import "../../Styles/ResetPasswordPageStyles.css";
+import { resetPassword } from "../../Service/api";
 
 const validationSchema = Yup.object({
   email: Yup.string()
