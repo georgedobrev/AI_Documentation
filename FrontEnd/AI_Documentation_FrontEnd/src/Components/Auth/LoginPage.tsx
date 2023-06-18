@@ -1,10 +1,10 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 import GoogleLogin from "@leecheuk/react-google-login";
 import "../../Styles/LoginPageStyles.css";
 import logo from "../../assets/DocuAuroraLogo_prev_ui.png";
-import { loginUser } from "../../Service/api";
-import { sendGoogleToken } from "../../Service/api";
+import { loginUser, sendGoogleToken } from "../../Service/api";
 import { GOOGLE_CLIENT_ID } from "../../config";
 import { GoogleResponse } from "../../Types/types";
 import { Link } from "react-router-dom";
@@ -25,19 +25,22 @@ const validationSchema = Yup.object({
     .required("Password is required."),
 });
 
-const responseGoogle = async (response: GoogleResponse) => {
-  if ("tokenId" in response) {
-    try {
-      const data = await sendGoogleToken(response.tokenId);
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    //todo
-  }
-};
-
 function LoginPage() {
+  const navigate = useNavigate();
+
+  const responseGoogle = async (response: GoogleResponse) => {
+    if ("tokenId" in response) {
+      try {
+        const data = await sendGoogleToken(response.tokenId);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', `Bearer ${data.token}`);
+        navigate("/");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       username: "",
@@ -46,8 +49,10 @@ function LoginPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const user = await loginUser(values);
-        //todo
+        const data = await loginUser(values);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', `Bearer ${data.token}`);
+        navigate("/");
       } catch (error) {
         console.error(error);
       }

@@ -27,19 +27,6 @@ const validationSchema = Yup.object({
     .required("Password is required."),
 });
 
-const responseGoogle = async (response: GoogleResponse) => {
-  //todo
-
-  if ("tokenId" in response) {
-    try {
-      const data = await sendGoogleToken(response.tokenId);
-      //todo
-    } catch (error) {
-      console.error(error);
-    }
-  }
-};
-
 function RegisterPage() {
   const navigate = useNavigate();
 
@@ -52,14 +39,28 @@ function RegisterPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const user = await registerUser(values);
-        //todo
-        navigate("/login");
+        const data = await registerUser(values);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', `Bearer ${data.token}`);
+        navigate("/");
       } catch (error) {
         console.error(error);
       }
     },
   });
+
+  const responseGoogle = async (response: GoogleResponse) => {
+    if ("tokenId" in response) {
+      try {
+        const data = await sendGoogleToken(response.tokenId);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', `Bearer ${data.token}`);
+        navigate("/");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   const renderGoogleLoginButton = () => (
     <GoogleLogin
@@ -148,3 +149,4 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
+
