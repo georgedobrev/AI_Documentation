@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,16 +29,16 @@ namespace DocuAurora.API.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
-        private readonly AuthService _authService;
+        private readonly EmailService _emailService;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, AuthService authService)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
-            _authService = authService;
+            _emailService = emailService;
 
         }
 
@@ -45,7 +46,7 @@ namespace DocuAurora.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
-            var result = await _authService.RegisterUser(model.Username, model.Email, model.Password);
+            var result = await _emailService.RegisterUser(model.Username, model.Email, model.Password);
 
             if (result.Succeeded)
             {
@@ -66,7 +67,7 @@ namespace DocuAurora.API.Controllers
                 return BadRequest("A code must be supplied for email confirmation.");
             }
 
-            var result = await _authService.ConfirmEmail(token);
+            var result = await _emailService.ConfirmEmail(token);
 
             if (result.Succeeded)
             {
@@ -206,6 +207,45 @@ namespace DocuAurora.API.Controllers
             return token;
         }
 
+        private static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+
+            var refreshToken = new
+            {
+                Token = Convert.ToBase64String(randomNumber),
+                ExpiryDate = DateTime.UtcNow.AddHours(24)
+            };
+
+            return JsonConvert.SerializeObject(refreshToken);
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"])),
+                ValidateLifetime = false // We are validating the token manually
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            return principal;
+        }
+
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
         {
@@ -214,7 +254,7 @@ namespace DocuAurora.API.Controllers
                 return BadRequest();
             }
 
-            var result = await _authService.SendPasswordResetEmail(model.Email);
+            var result = await _emailService.SendPasswordResetEmail(model.Email);
 
             return result ? Ok() : BadRequest();
         }
@@ -227,9 +267,41 @@ namespace DocuAurora.API.Controllers
                 return BadRequest();
             }
 
-            var result = await _authService.ResetPassword(token, model.Password);
+            var result = await _emailService.ResetPassword(token, model.Password);
 
             return result.Succeeded ? Ok() : BadRequest(result.Errors.Select(e => e.Description));
+        }
+
+        [HttpPost("Refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenViewModel model)
+        {
+            var principal = GetPrincipalFromExpiredToken(model.Token);
+            var username = principal.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var storedRefreshToken = await _userManager.GetAuthenticationTokenAsync(user, "JWT", "RefreshToken");
+            var refreshTokenObject = JsonConvert.DeserializeObject<dynamic>(storedRefreshToken);
+
+            if (refreshTokenObject.Token != model.RefreshToken || refreshTokenObject.ExpiryDate <= DateTime.UtcNow)
+            {
+                return BadRequest();
+            }
+
+            var newJwtToken = GetToken(principal.Claims);
+            var newRefreshToken = GenerateRefreshToken();
+            await _userManager.SetAuthenticationTokenAsync(user, "JWT", "RefreshToken", newRefreshToken);
+
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(newJwtToken),
+                expiration = newJwtToken.ValidTo,
+                refreshToken = newRefreshToken
+            });
         }
 
     }

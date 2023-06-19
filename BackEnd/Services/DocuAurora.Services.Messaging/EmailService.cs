@@ -1,23 +1,26 @@
 ﻿using DocuAurora.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace DocuAurora.Services.Messaging
 {
-    public class AuthService
+    public class EmailService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         
 
-        public AuthService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, SignInManager<ApplicationUser> signInManager)
+        public EmailService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _emailSender = emailSender;
@@ -81,5 +84,19 @@ namespace DocuAurora.Services.Messaging
 
             return result;
         }
+
+        private static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+
+            var refreshToken = new
+            {
+                Token = Convert.ToBase64String(randomNumber),
+                ExpiryDate = DateTime.UtcNow.AddHours(24)
+            };
+
+            return JsonConvert.SerializeObject(refreshToken);
+        }
     }
-}
