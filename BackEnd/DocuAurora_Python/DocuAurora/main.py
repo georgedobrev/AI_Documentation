@@ -34,11 +34,6 @@ if __name__ == '__main__':
     rabbitmq_service.create_queues()
     rabbitmq_service.consume_messages(queue_callbacks)
 
-    # TO DO put this logic in rabittmq when receive msg to send file to model and import s3SERVICE !!!
-    # s3_service = S3Service(region_name)
-    # s3_service.process_files(bucket_name, object_keys, program_path)
-
-
     # local_llm = setup_model('google/flan-t5-base')
     # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
     # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Test2.pdf')
