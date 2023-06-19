@@ -1,6 +1,6 @@
 import json
 
-from Model.t5_model import local_llm
+# from Model.t5_model import local_llm
 
 
 def callbackMessage(ch, method, properties, body):
