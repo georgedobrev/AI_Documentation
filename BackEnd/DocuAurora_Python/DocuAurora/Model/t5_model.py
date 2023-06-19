@@ -36,6 +36,6 @@ def ask_question(qa_chain, query):
         print('\n\nSources:')
         for source in llm_response["source_documents"]:
             print(source.metadata['source'])
-    llm_response = qa_chain(query)
-    process_llm_response(llm_response)
+            llm_response = qa_chain(query)
+            process_llm_response(llm_response)
 

@@ -1,6 +1,7 @@
 import json
+import os
 from pathlib import Path
-from AnswerGeneratorService import AnswerGeneratorService
+from Services.AnswerGeneratorService import AnswerGeneratorService
 
 
 # from Model.t5_model import local_llm
@@ -13,10 +14,12 @@ def callbackMessage(ch, method, properties, body):
     print(
         f'Hello Admin, we received your message => {data} commandName => {command_name} input_question => {input_question}')
 
-    script_dir = Path(__file__).resolve().parent
-    config_file = script_dir / "config.ini"
+    main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    answer_generator = AnswerGeneratorService(config_file)
+    config_file_path = os.path.join(main_dir, 'config.ini')
+
+
+    answer_generator = AnswerGeneratorService(config_file_path)
     question = "Who have contribution for book history in Bulgaria?"
     answer = answer_generator.generate_answer(question)
 

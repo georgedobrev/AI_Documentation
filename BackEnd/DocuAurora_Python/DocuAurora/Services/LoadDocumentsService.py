@@ -1,11 +1,5 @@
-import configparser
-import os
-
-import subprocess
-import boto3
-from Model.t5_model import setup_model, load_documents, setup_pinecone, setup_retrieval_qa, split_text, ask_question
-from S3Service import S3Service
-from AnswerGeneratorService import AnswerGeneratorService
+from Services.S3Service import S3Service
+from Services.AnswerGeneratorService import AnswerGeneratorService
 
 
 class LoadDocumentsService:

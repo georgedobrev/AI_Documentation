@@ -12,13 +12,9 @@ def callbackFile(ch, method, properties, body, publish_message):
     print(f'Hello Admin, we received your message => {data} commandName => {bucket_name} file_key => {file_key}')
     print(f'file queue {body}')
 
-    publish_message("primerno")
-
-    # to do return messages. how to write public message
-
-    script_dir = Path(__file__).resolve().parent
-    config_file = script_dir / "config.ini"
-    load_documents_service = LoadDocumentsService(config_file)
+    main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    config_file_path = os.path.join(main_dir, 'config.ini')
+    load_documents_service = LoadDocumentsService(config_file_path)
     base_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base_path, 'AI_Documentation', 'BackEnd', 'DocuAurora_Python', 'DocuAurora', 'Model')
 

@@ -1,5 +1,6 @@
-from Model.t5_model import setup_model, load_documents, setup_pinecone, setup_retrieval_qa, split_text, ask_question
 import configparser
+from Model.t5_model import setup_model, load_documents, setup_pinecone, setup_retrieval_qa, split_text, ask_question
+
 
 
 class AnswerGeneratorService:
@@ -11,7 +12,7 @@ class AnswerGeneratorService:
         self.model_namePinecone = self._get_config_value('Pinecone', 'model_name')
         self.api_key = self._get_config_value('Pinecone', 'API_KEY')
         self.environment = self._get_config_value('Pinecone', 'environment')
-        self.index_name = self._get_config_value('Pinecone', 'environment')
+        self.index_name = self._get_config_value('Pinecone', 'index_name')
         self.retriever = None
         self.qa_chain = None
 

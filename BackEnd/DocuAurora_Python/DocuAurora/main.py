@@ -39,17 +39,17 @@ if __name__ == '__main__':
     # s3_service.process_files(bucket_name, object_keys, program_path)
 
 
-    local_llm = setup_model('google/flan-t5-base')
-    documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
-    documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Test2.pdf')
-    chunks = split_text(documents)
-    retriever = setup_pinecone(chunks, "hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test2")
-    qa_chain = setup_retrieval_qa(local_llm, retriever)
-
-    # Asking Questions
-    ask_question(qa_chain, "who have contribution for book history in Bulgaria?")
-    ask_question(qa_chain, "who is John Draper?")
-    ask_question(qa_chain, "what is the capital of Germany?")
+    # local_llm = setup_model('google/flan-t5-base')
+    # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
+    # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Test2.pdf')
+    # chunks = split_text(documents)
+    # retriever = setup_pinecone(chunks, "hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test2")
+    # qa_chain = setup_retrieval_qa(local_llm, retriever)
+    #
+    # # Asking Questions
+    # ask_question(qa_chain, "who have contribution for book history in Bulgaria?")
+    # ask_question(qa_chain, "who is John Draper?")
+    # ask_question(qa_chain, "what is the capital of Germany?")
     
     app.run(host='0.0.0.0', port=5000, debug=True)
 
