@@ -33,8 +33,10 @@
     <ProjectReference Include="..\..\API\DocuAurora.API.ViewModels\DocuAurora.API.ViewModels.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Common\DocuAurora.Data.Common.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data.Models\DocuAurora.Data.Models.csproj" />
+    <ProjectReference Include="..\..\DocuAurora.Common\DocuAurora.Common.csproj" />
     <ProjectReference Include="..\DocuAurora.Services.Mapping\DocuAurora.Services.Mapping.csproj" />
     <ProjectReference Include="..\..\Data\DocuAurora.Data\DocuAurora.Data.csproj" />
+    <ProjectReference Include="..\DocuAurora.Services.Messaging\DocuAurora.Services.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

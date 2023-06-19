@@ -79,8 +79,10 @@
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
-            services.AddTransient<AuthService>();
+            services.AddTransient<EmailService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
+
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }
@@ -270,7 +272,7 @@
                 {
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
-                    
+
                     Console.WriteLine("Reply received message: {0}", message);
                 };
 
