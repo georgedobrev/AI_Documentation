@@ -18,7 +18,7 @@ namespace DocuAurora.Services.Messaging
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
-        
+
 
         public EmailService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, SignInManager<ApplicationUser> signInManager)
         {
@@ -85,18 +85,5 @@ namespace DocuAurora.Services.Messaging
             return result;
         }
 
-        private static string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-
-            var refreshToken = new
-            {
-                Token = Convert.ToBase64String(randomNumber),
-                ExpiryDate = DateTime.UtcNow.AddHours(24)
-            };
-
-            return JsonConvert.SerializeObject(refreshToken);
-        }
     }
+}

@@ -1,5 +1,7 @@
 ﻿using DocuAurora.API.ViewModels.Administration.Users;
 using DocuAurora.Data.Models;
+using DocuAurora.Services.Data;
+using DocuAurora.Services.Data.Contracts;
 using DocuAurora.Services.Messaging;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
@@ -30,15 +32,18 @@ namespace DocuAurora.API.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
+        private readonly IAuthService _authService;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, EmailService emailService)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, EmailService emailService, IAuthService authService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
             _emailService = emailService;
+            _authService = authService;
+
 
         }
 
@@ -87,22 +92,25 @@ namespace DocuAurora.API.Controllers
                 var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+        };
 
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-                var token = GetToken(authClaims);
+                var token = _authService.GenerateJwtToken(authClaims);
+                var refreshToken = await _authService.CreateRefreshToken(user);
 
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    expiration = token.ValidTo,
+                    refreshToken
                 });
             }
             return Unauthorized("Wrong password or username");
@@ -142,13 +150,11 @@ namespace DocuAurora.API.Controllers
             var tokenData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenResponse);
             string idToken = tokenData["id_token"];
 
-            // Parse the id token to get user information
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings());
 
             var user = await _userManager.FindByEmailAsync(payload.Email);
             if (user == null)
             {
-                // User doesn't exist, create a new user
                 user = new ApplicationUser
                 {
                     UserName = payload.Email,
@@ -156,15 +162,9 @@ namespace DocuAurora.API.Controllers
                 };
 
                 var identityResult = await _userManager.CreateAsync(user);
-                // Check if user creation was successful, otherwise handle error
             }
 
-            // Link the user with the login
             var result = await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", payload.Subject, "Google"));
-            if (!result.Succeeded)
-            {
-                // Handle errors
-            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -174,12 +174,14 @@ namespace DocuAurora.API.Controllers
         new Claim(ClaimTypes.Name, user.UserName),
         new Claim(ClaimTypes.Email, user.Email),
     };
-            var token = GetToken(authClaims);
+            var jwtToken = _authService.GenerateJwtToken(authClaims);
+            var refreshToken = await _authService.CreateRefreshToken(user);
 
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
+                expiration = jwtToken.ValidTo,
+                refreshToken
             });
         }
 
@@ -190,60 +192,6 @@ namespace DocuAurora.API.Controllers
             await _signInManager.SignOutAsync();
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return Ok("Logout successful.");
-        }
-
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
-                expires: DateTime.Now.AddHours(2),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            return token;
-        }
-
-        private static string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-
-            var refreshToken = new
-            {
-                Token = Convert.ToBase64String(randomNumber),
-                ExpiryDate = DateTime.UtcNow.AddHours(24)
-            };
-
-            return JsonConvert.SerializeObject(refreshToken);
-        }
-
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"])),
-                ValidateLifetime = false // We are validating the token manually
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            {
-                throw new SecurityTokenException("Invalid token");
-            }
-
-            return principal;
         }
 
         [HttpPost("ForgotPassword")]
@@ -272,36 +220,36 @@ namespace DocuAurora.API.Controllers
             return result.Succeeded ? Ok() : BadRequest(result.Errors.Select(e => e.Description));
         }
 
-        [HttpPost("Refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenViewModel model)
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenViewModel model)
         {
-            var principal = GetPrincipalFromExpiredToken(model.Token);
-            var username = principal.Identity.Name;
-            var user = await _userManager.FindByNameAsync(username);
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var tokenS = handler.ReadToken(model.JWTToken) as JwtSecurityToken;
 
+            var userIdClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
-            var storedRefreshToken = await _userManager.GetAuthenticationTokenAsync(user, "JWT", "RefreshToken");
-            var refreshTokenObject = JsonConvert.DeserializeObject<dynamic>(storedRefreshToken);
-
-            if (refreshTokenObject.Token != model.RefreshToken || refreshTokenObject.ExpiryDate <= DateTime.UtcNow)
+            var storedRefreshToken = await _authService.GetStoredRefreshToken(user);
+            if (storedRefreshToken != model.RefreshToken)
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
-            var newJwtToken = GetToken(principal.Claims);
-            var newRefreshToken = GenerateRefreshToken();
-            await _userManager.SetAuthenticationTokenAsync(user, "JWT", "RefreshToken", newRefreshToken);
+            var newJwtToken = _authService.GenerateJwtToken(tokenS.Claims.ToList());
+            var newJwtTokenString = new JwtSecurityTokenHandler().WriteToken(newJwtToken);
 
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(newJwtToken),
-                expiration = newJwtToken.ValidTo,
-                refreshToken = newRefreshToken
-            });
+            return Ok(new { token = newJwtTokenString });
         }
 
     }

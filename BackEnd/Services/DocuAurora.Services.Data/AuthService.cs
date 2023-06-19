@@ -16,15 +16,13 @@ namespace DocuAurora.Services.Data
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AuthService(
-                            UserManager<ApplicationUser> userManager,
-                            IConfiguration configuration)
+        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            this.userManager = userManager;
-            this._configuration = configuration;
+            _userManager = userManager;
+            _configuration = configuration;
         }
 
         public JwtSecurityToken GenerateJwtToken(List<Claim> claims)
@@ -42,7 +40,7 @@ namespace DocuAurora.Services.Data
 
         public async Task<string> CreateRefreshToken(ApplicationUser user)
         {
-            var refreshToken = GenerateRefreshToken();
+            var refreshToken = GenerateRefreshToken(user);
             await _userManager.SetAuthenticationTokenAsync(user, "JWT", "RefreshToken", refreshToken);
             return refreshToken;
         }
@@ -57,12 +55,27 @@ namespace DocuAurora.Services.Data
             await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "RefreshToken");
         }
 
-        private string GenerateRefreshToken()
+        private string GenerateRefreshToken(ApplicationUser user)
         {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddHours(24);
+
+            var token = new JwtSecurityToken(
+                _configuration["JwtSettings:Issuer"],
+                _configuration["JwtSettings:Audience"],
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

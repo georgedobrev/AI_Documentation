@@ -1,10 +1,8 @@
 ﻿using DocuAurora.Data.Models;
-using System;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DocuAurora.Services.Data.Contracts
@@ -19,4 +17,5 @@ namespace DocuAurora.Services.Data.Contracts
 
         Task RemoveRefreshToken(ApplicationUser user);
     }
+
 }
