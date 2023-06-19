@@ -5,7 +5,7 @@ from pathlib import Path
 from Services.LoadDocumentsService import LoadDocumentsService
 
 
-def callbackFile(ch, method, properties, body, publish_message):
+def callbackFile(ch, method, properties, body):
     data = json.loads(body.decode())
     bucket_name = data['BucketName']
     file_key = data['DocumentNames']

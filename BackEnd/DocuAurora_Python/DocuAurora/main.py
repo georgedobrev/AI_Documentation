@@ -27,8 +27,8 @@ if __name__ == '__main__':
 
     #queue/callback container
     queue_callbacks = {
-        queue1_name: callbackMessage,
-        queue2_name: callbackFile
+        queue2_name: callbackFile,
+        queue1_name: callbackMessage
     }
 
     rabbitmq_service.create_queues()

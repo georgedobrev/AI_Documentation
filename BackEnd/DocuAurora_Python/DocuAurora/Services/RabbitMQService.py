@@ -37,7 +37,7 @@ class RabbitMQService:
     def consume_messages(self, queue_callbacks):
         for queue_name, callback in queue_callbacks.items():
             self.channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
-            self.channel.start_consuming()
+        self.channel.start_consuming()
 
     def close_connection(self):
         if self.connection and not self.connection.is_closed:
