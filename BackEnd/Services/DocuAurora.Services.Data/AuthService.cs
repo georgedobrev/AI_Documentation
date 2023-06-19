@@ -1,6 +1,6 @@
 ﻿using DocuAurora.Data.Models;
 using DocuAurora.Services.Data.Contracts;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -16,13 +16,15 @@ namespace DocuAurora.Services.Data
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration _configuration;
 
-        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public AuthService(
+                            UserManager<ApplicationUser> userManager,
+                            IConfiguration configuration)
         {
-            _userManager = userManager;
-            _configuration = configuration;
+            this.userManager = userManager;
+            this._configuration = configuration;
         }
 
         public JwtSecurityToken GenerateJwtToken(List<Claim> claims)
