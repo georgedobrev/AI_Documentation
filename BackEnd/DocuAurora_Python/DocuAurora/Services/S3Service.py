@@ -21,20 +21,12 @@ class S3Service:
         return config.get(section, key)
 
     def download_files(self, bucket_name, object_keys, file_path):
-        for object_key, file_path in zip(object_keys, file_path):
+        for object_key in object_keys:
+            print(file_path)
             self.s3.download_file(bucket_name, object_key, file_path)
             print(f"File '{object_key}' downloaded successfully.")
 
-    def unzip_files(self, file_paths, extract_path):
-        for file_path in file_paths:
-            with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_path)
-            print(f"File '{file_path}' extracted successfully.")
 
-    def unzip_files(self, file_path, extract_path):
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_path)
-        print(f"File '{file_path}' extracted successfully.")
 
     # def send_file(self, file_path):
     #     try:

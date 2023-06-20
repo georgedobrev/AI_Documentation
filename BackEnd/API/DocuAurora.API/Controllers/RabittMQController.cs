@@ -21,14 +21,15 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService = rabbitMQService;
             this._configuration = configuration;
+            this._rabbitMQService.ReceiveResponse<string>("test", x => { Ok(x); });
+
         }
 
         [HttpPost("message")]
         public async Task<IActionResult> Post([FromBody] RabbitMQMessage message)
         {
             this._rabbitMQService.SendMessage(message, this._configuration["RabbitMQMessageQueueConfiguration:Queue"], this._configuration["RabbitMQRoutingKeyMessageConfiguration:RoutingKey"]);
-         //   var response = await this._rabbitMQService.ReceiveResponse(this._configuration["RabbitMQMessageQueueConfiguration:Queue"]);
-
+         
             return Ok();
         }
 

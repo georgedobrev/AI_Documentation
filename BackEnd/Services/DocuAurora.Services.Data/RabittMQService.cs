@@ -25,30 +25,21 @@ namespace DocuAurora.Services.Data
             this.channel = channel;
         }
 
-        public async Task<string> ReceiveResponse(string queue, IBasicProperties properties = null)
+        public async Task ReceiveResponse(string queue, Action<T> action, IBasicProperties properties = null)
         {
-            var consumer = new EventingBasicConsumer(this.channel);
-            var tcs = new TaskCompletionSource<string>();
+          
 
+            var consumer = new EventingBasicConsumer(this.channel);
             consumer.Received += (model, ea) =>
             {
-                var response = Encoding.UTF8.GetString(ea.Body.ToArray());
-                tcs.TrySetResult(response);
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                action(message);
+                Console.WriteLine("Reply received message: {0}", message);
             };
 
-            this.channel.BasicConsume(queue, autoAck: true, consumer);
+            this.channel.BasicConsume(queue, autoAck: true, consumer: consumer);
 
-            // Wait for the response or a timeout
-            var responseTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30)));
-
-            if (responseTask == tcs.Task)
-            {
-                return tcs.Task.Result;
-            }
-            else
-            {
-                throw new TimeoutException("No response received from RabbitMQ.");
-            }
         }
 
         public void SendMessage<T>(T message, string queue, string routingKey, string exchange, IBasicProperties properties)

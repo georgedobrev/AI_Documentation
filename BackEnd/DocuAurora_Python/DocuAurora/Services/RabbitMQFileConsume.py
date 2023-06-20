@@ -15,10 +15,12 @@ def callbackFile(ch, method, properties, body):
     main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     config_file_path = os.path.join(main_dir, 'config.ini')
     load_documents_service = LoadDocumentsService(config_file_path)
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_path, 'AI_Documentation', 'BackEnd', 'DocuAurora_Python', 'DocuAurora', 'Model')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, 'Model')
+
+    print(f'{bucket_name} -- {file_key} --- {file_path}{file_key}')
 
     load_documents_service.download_files(bucket_name, file_key, file_path)
-    load_documents_service.unzip_files(file_path, file_path)
     load_documents_service.load_documents(file_path)
+
     print(file_path)
