@@ -9,8 +9,5 @@ namespace DocuAurora.API.ViewModels.Administration.Users
     public class RefreshTokenViewModel
     {
         public string JWTToken { get; set; }
-
-        public string RefreshToken { get; set; }
-
     }
 }

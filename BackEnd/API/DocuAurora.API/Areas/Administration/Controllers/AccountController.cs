@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
@@ -51,7 +52,7 @@ namespace DocuAurora.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
-            var result = await _emailService.RegisterUser(model.Username, model.Email, model.Password);
+            var result = await _emailService.RegisterUserAndSendEmail(model.Username, model.Email, model.Password);
 
             if (result.Succeeded)
             {
@@ -108,9 +109,7 @@ namespace DocuAurora.API.Controllers
 
                 return Ok(new
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                    refreshToken
+                    token = new JwtSecurityTokenHandler().WriteToken(token)
                 });
             }
             return Unauthorized("Wrong password or username");
@@ -179,9 +178,7 @@ namespace DocuAurora.API.Controllers
 
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-                expiration = jwtToken.ValidTo,
-                refreshToken
+                token = new JwtSecurityTokenHandler().WriteToken(jwtToken)
             });
         }
 
@@ -241,7 +238,9 @@ namespace DocuAurora.API.Controllers
             }
 
             var storedRefreshToken = await _authService.GetStoredRefreshToken(user);
-            if (storedRefreshToken != model.RefreshToken)
+            var dbToken = handler.ReadToken(storedRefreshToken);
+
+            if (dbToken.ValidTo <= DateTime.UtcNow)
             {
                 return Unauthorized();
             }
