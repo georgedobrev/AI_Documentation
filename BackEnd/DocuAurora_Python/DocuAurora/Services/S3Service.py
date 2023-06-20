@@ -8,7 +8,7 @@ import zipfile
 class S3Service:
     def __init__(self, config_file):
         self.config_file = config_file
-        self.region_name = self._get_config_value('S3', 'eu-central-1')
+        self.region_name = self._get_config_value('S3', 'region_name')
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
