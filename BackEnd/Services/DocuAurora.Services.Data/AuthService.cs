@@ -32,7 +32,7 @@ namespace DocuAurora.Services.Data
             return new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.Now.AddMinutes(15),
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
@@ -53,6 +53,7 @@ namespace DocuAurora.Services.Data
         public async Task RemoveRefreshToken(ApplicationUser user)
         {
             await _userManager.RemoveAuthenticationTokenAsync(user, "JWT", "RefreshToken");
+
         }
 
         private string GenerateRefreshToken(ApplicationUser user)
@@ -65,7 +66,7 @@ namespace DocuAurora.Services.Data
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddHours(24);
+            var expires = DateTime.Now.AddHours(12);
 
             var token = new JwtSecurityToken(
                 _configuration["JwtSettings:Issuer"],

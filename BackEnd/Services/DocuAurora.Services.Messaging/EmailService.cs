@@ -27,7 +27,7 @@ namespace DocuAurora.Services.Messaging
             _signInManager = signInManager;
         }
 
-        public async Task<IdentityResult> RegisterUser(string name, string email, string password)
+        public async Task<IdentityResult> RegisterUserAndSendEmail(string name, string email, string password)
         {
             var user = new ApplicationUser { UserName = name, Email = email };
             var result = await _userManager.CreateAsync(user, password);
