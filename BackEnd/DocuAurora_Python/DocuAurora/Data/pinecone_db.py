@@ -20,8 +20,3 @@ def setup_pinecone(chunks, model_name, api_key, environment, index_name):
     pinecone.init(api_key=api_key, environment=environment)
     Pinecone.from_documents(documents=chunks, embedding=embeddings, index_name=index_name)
 
-
-
-documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
-chunks = split_text(documents)
-setup_pinecone(chunks, "hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test")

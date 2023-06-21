@@ -8,9 +8,6 @@ from Services.RabbitMQService import RabbitMQService
 from Services.RabbitMQFileConsume import callbackFile
 from Services.RabbitMQMessageConsume import callbackMessage
 
-from Model.t5_model import setup_model, load_documents, setup_pinecone, setup_retrieval_qa, split_text, ask_question
-
-# from Model.t5_model import local_llm
 
 app = Flask(__name__)
 

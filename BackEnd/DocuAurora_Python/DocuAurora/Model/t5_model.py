@@ -33,13 +33,3 @@ def ask_question(qa_chain, query):
     llm_response = qa_chain(query)
     process_llm_response(llm_response)
 
-
-local_llm = setup_model('google/flan-t5-base')
-
-retriever = asking_existing_index("hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test")
-
-qa_chain = setup_retrieval_qa(local_llm, retriever)
-
-# Asking Questions
-
-ask_question(qa_chain, "who have contribution for book history in Bulgaria?")
