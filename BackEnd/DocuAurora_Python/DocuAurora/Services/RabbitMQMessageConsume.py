@@ -18,10 +18,9 @@ def callbackMessage(ch, method, properties, body):
 
     config_file_path = os.path.join(main_dir, 'config.ini')
 
-
     answer_generator = AnswerGeneratorService(config_file_path)
-    question = "Who have contribution for book history in Bulgaria?"
-    answer = answer_generator.generate_answer(question)
+    answer_generator.load_existing_index()
+    answer = answer_generator.generate_answer(input_question)
 
     print(answer)
     response_data = {
