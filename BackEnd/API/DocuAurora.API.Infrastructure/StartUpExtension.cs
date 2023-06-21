@@ -263,7 +263,7 @@
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
 
-                channelCreation.Value.QueueDeclare("response", exclusive: true);
+                channelCreation.Value.QueueDeclare("response", exclusive: false);
 
                 return channelCreation.Value;
             });
