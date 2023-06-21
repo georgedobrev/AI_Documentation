@@ -21,7 +21,7 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService = rabbitMQService;
             this._configuration = configuration;
-            this._rabbitMQService.ReceiveResponse<string>("test", x => { Ok(x); });
+            this._rabbitMQService.ReceiveResponse<RabbitMQMessageAnswer>("response", x => { Ok(x); });
 
         }
 
@@ -30,7 +30,7 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService.SendMessage(message, this._configuration["RabbitMQMessageQueueConfiguration:Queue"], this._configuration["RabbitMQRoutingKeyMessageConfiguration:RoutingKey"]);
 
-            var response = 
+            //var response = 
 
             return Ok();
         }

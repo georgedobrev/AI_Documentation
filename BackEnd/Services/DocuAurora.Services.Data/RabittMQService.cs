@@ -27,25 +27,19 @@ namespace DocuAurora.Services.Data
 
         public void ReceiveResponse<T>(string queue, Action<T> action, IBasicProperties properties = null)
         {
-          
-
             var consumer = new EventingBasicConsumer(this.channel);
             consumer.Received += HandleMessageReceived;
-            
 
             this.channel.BasicConsume(queue, autoAck: true, consumer: consumer);
 
             void HandleMessageReceived(object sender, BasicDeliverEventArgs eventArgs)
             {
-                
                 var body = eventArgs.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var item = JsonSerializer.Deserialize<T>(message);
               
                 Console.WriteLine("Reply received message: {0}", message);
                 action(item);
-
-
             }
         }
 
