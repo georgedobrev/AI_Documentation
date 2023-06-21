@@ -25,11 +25,12 @@ def setup_retrieval_qa(local_llm, retriever):
 
 def ask_question(qa_chain, query):
     def process_llm_response(llm_response):
-        print(llm_response['result'])
-        print('\n\nSources:')
-        for source in llm_response["source_documents"]:
-            print(source.metadata['source'])
+        return llm_response['result']
+        # print('\n\nSources:')
+        # for source in llm_response["source_documents"]:
+        #     print(source.metadata['source'])
 
     llm_response = qa_chain(query)
-    process_llm_response(llm_response)
+    answer = process_llm_response(llm_response)
+    return  answer
 
