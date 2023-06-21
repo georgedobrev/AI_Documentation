@@ -25,21 +25,28 @@ namespace DocuAurora.Services.Data
             this.channel = channel;
         }
 
-        public async Task ReceiveResponse(string queue, Action<T> action, IBasicProperties properties = null)
+        public void ReceiveResponse<T>(string queue, Action<T> action, IBasicProperties properties = null)
         {
           
 
             var consumer = new EventingBasicConsumer(this.channel);
-            consumer.Received += (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                action(message);
-                Console.WriteLine("Reply received message: {0}", message);
-            };
+            consumer.Received += HandleMessageReceived;
+            
 
             this.channel.BasicConsume(queue, autoAck: true, consumer: consumer);
 
+            void HandleMessageReceived(object sender, BasicDeliverEventArgs eventArgs)
+            {
+                
+                var body = eventArgs.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                var item = JsonSerializer.Deserialize<T>(message);
+              
+                Console.WriteLine("Reply received message: {0}", message);
+                action(item);
+
+
+            }
         }
 
         public void SendMessage<T>(T message, string queue, string routingKey, string exchange, IBasicProperties properties)
