@@ -263,18 +263,7 @@
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
 
-                channelCreation.Value.QueueDeclare("response", exclusive: false);
-
-               // var consumer = new EventingBasicConsumer(channelCreation.Value);
-               // consumer.Received += (model, ea) =>
-               // {
-                 //   var body = ea.Body.ToArray();
-                   // var message = Encoding.UTF8.GetString(body);
-                    
-                  //  Console.WriteLine("Reply received message: {0}", message);
-                //};
-
-               // channelCreation.Value.BasicConsume(queue: replyQueue.QueueName, autoAck: true, consumer: consumer);
+                channelCreation.Value.QueueDeclare("response", exclusive: true);
 
                 return channelCreation.Value;
             });
