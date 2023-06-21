@@ -30,7 +30,7 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService.SendMessage(message, this._configuration["RabbitMQMessageQueueConfiguration:Queue"], this._configuration["RabbitMQRoutingKeyMessageConfiguration:RoutingKey"]);
 
-            var response = this._rabbitMQService.ReceiveResponse<RabbitMQMessageAnswer>("response", x => { Ok(x); });
+            var response = this._rabbitMQService.ReceiveResponse<RabbitMQMessageAnswer>("response");
 
             if (response == null)
             {
