@@ -186,8 +186,11 @@ namespace DocuAurora.API.Controllers
 
         public async Task<IActionResult> Logout()
         {
+            var user = await _userManager.GetUserAsync(User);
             await _signInManager.SignOutAsync();
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            await _authService.RemoveRefreshToken(user);
+
             return Ok("Logout successful.");
         }
 
