@@ -1,6 +1,8 @@
-﻿using DocuAurora.API.ViewModels;
+﻿using Azure;
+using DocuAurora.API.ViewModels;
 using DocuAurora.API.ViewModels.RabittMQ;
 using DocuAurora.Services.Data.Contracts;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +23,6 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService = rabbitMQService;
             this._configuration = configuration;
-            this._rabbitMQService.ReceiveResponse<RabbitMQMessageAnswer>("response", x => { Ok(x); });
-
         }
 
         [HttpPost("message")]
@@ -30,9 +30,14 @@ namespace DocuAurora.API.Controllers
         {
             this._rabbitMQService.SendMessage(message, this._configuration["RabbitMQMessageQueueConfiguration:Queue"], this._configuration["RabbitMQRoutingKeyMessageConfiguration:RoutingKey"]);
 
-            //var response = 
+            var response = this._rabbitMQService.ReceiveResponse<RabbitMQMessageAnswer>("response", x => { Ok(x); });
 
-            return Ok();
+            if (response == null)
+            {
+               return NotFound();
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("filemessage")]
