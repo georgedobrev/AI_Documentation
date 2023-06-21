@@ -1,5 +1,6 @@
 import configparser
-from Model.t5_model import setup_model, load_documents, setup_pinecone, setup_retrieval_qa, split_text, ask_question
+from Model.t5_model import setup_model, asking_existing_index, setup_retrieval_qa, ask_question
+from Data.pinecone_db import load_documents,  split_text, setup_pinecone
 
 
 
@@ -31,7 +32,14 @@ class AnswerGeneratorService:
                                         self.api_key,
                                         self.environment,
                                         self.index_name)
+        
+    def load_existing_index(self):
+        self.retriever = asking_existing_index(self.model_namePinecone,
+                                               self.api_key,
+                                               self.environment,
+                                               self.index_name)
         self.qa_chain = setup_retrieval_qa(self.local_llm, self.retriever)
+        
 
     def generate_answer(self, question):
         return ask_question(self.qa_chain, question)
