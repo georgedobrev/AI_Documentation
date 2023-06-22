@@ -20,6 +20,12 @@ def asking_existing_index(model_name, api_key, environment, index_name):
     pineconedb = Pinecone.from_existing_index(index_name=index_name,embedding=embeddings)
     return pineconedb.as_retriever(search_type="similarity", search_kwargs={"k":3})
 
+def asking_existing_index(chunks, model_name, api_key, environment, index_name):
+    embeddings = HuggingFaceInstructEmbeddings(model_name=model_name, model_kwargs={"device": "cpu"})
+    pinecone.init(api_key=api_key, environment=environment)
+    pineconedb = Pinecone.from_existing_index(documents=chunks, embedding=embeddings, index_name=index_name, text_key=" ")
+    retriever = pineconedb.as_retriever(search_type="similarity", search_kwargs={"k":3})
+
 def setup_retrieval_qa(local_llm, retriever):
     return RetrievalQA.from_chain_type(llm=local_llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
 
@@ -34,3 +40,4 @@ def ask_question(qa_chain, query):
     answer = process_llm_response(llm_response)
     return  answer
 
+   

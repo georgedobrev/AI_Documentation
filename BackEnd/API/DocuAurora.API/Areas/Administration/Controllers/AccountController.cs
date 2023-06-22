@@ -1,5 +1,7 @@
 ﻿using DocuAurora.API.ViewModels.Administration.Users;
 using DocuAurora.Data.Models;
+using DocuAurora.Services.Data;
+using DocuAurora.Services.Data.Contracts;
 using DocuAurora.Services.Messaging;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
@@ -11,10 +13,12 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,16 +32,19 @@ namespace DocuAurora.API.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
-        private readonly AuthService _authService;
+        private readonly EmailService _emailService;
+        private readonly IAuthService _authService;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, AuthService authService)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IEmailSender emailSender, EmailService emailService, IAuthService authService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
+            _emailService = emailService;
             _authService = authService;
+
 
         }
 
@@ -45,7 +52,7 @@ namespace DocuAurora.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserViewModel model)
         {
 
-            var result = await _authService.RegisterUser(model.Username, model.Email, model.Password);
+            var result = await _emailService.RegisterUserAndSendEmail(model.Username, model.Email, model.Password);
 
             if (result.Succeeded)
             {
@@ -66,7 +73,7 @@ namespace DocuAurora.API.Controllers
                 return BadRequest("A code must be supplied for email confirmation.");
             }
 
-            var result = await _authService.ConfirmEmail(token);
+            var result = await _emailService.ConfirmEmail(token);
 
             if (result.Succeeded)
             {
@@ -86,22 +93,23 @@ namespace DocuAurora.API.Controllers
                 var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+        };
 
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-                var token = GetToken(authClaims);
+                var token = _authService.GenerateJwtToken(authClaims);
+                var refreshToken = await _authService.CreateRefreshToken(user);
 
                 return Ok(new
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    token = new JwtSecurityTokenHandler().WriteToken(token)
                 });
             }
             return Unauthorized("Wrong password or username");
@@ -141,13 +149,11 @@ namespace DocuAurora.API.Controllers
             var tokenData = JsonConvert.DeserializeObject<Dictionary<string, string>>(tokenResponse);
             string idToken = tokenData["id_token"];
 
-            // Parse the id token to get user information
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings());
 
             var user = await _userManager.FindByEmailAsync(payload.Email);
             if (user == null)
             {
-                // User doesn't exist, create a new user
                 user = new ApplicationUser
                 {
                     UserName = payload.Email,
@@ -155,15 +161,9 @@ namespace DocuAurora.API.Controllers
                 };
 
                 var identityResult = await _userManager.CreateAsync(user);
-                // Check if user creation was successful, otherwise handle error
             }
 
-            // Link the user with the login
             var result = await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", payload.Subject, "Google"));
-            if (!result.Succeeded)
-            {
-                // Handle errors
-            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -173,12 +173,12 @@ namespace DocuAurora.API.Controllers
         new Claim(ClaimTypes.Name, user.UserName),
         new Claim(ClaimTypes.Email, user.Email),
     };
-            var token = GetToken(authClaims);
+            var jwtToken = _authService.GenerateJwtToken(authClaims);
+            var refreshToken = await _authService.CreateRefreshToken(user);
 
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                token = new JwtSecurityTokenHandler().WriteToken(jwtToken)
             });
         }
 
@@ -186,24 +186,12 @@ namespace DocuAurora.API.Controllers
 
         public async Task<IActionResult> Logout()
         {
+            var user = await _userManager.GetUserAsync(User);
             await _signInManager.SignOutAsync();
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            await _authService.RemoveRefreshToken(user);
+
             return Ok("Logout successful.");
-        }
-
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
-                expires: DateTime.Now.AddHours(2),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            return token;
         }
 
         [HttpPost("ForgotPassword")]
@@ -214,7 +202,7 @@ namespace DocuAurora.API.Controllers
                 return BadRequest();
             }
 
-            var result = await _authService.SendPasswordResetEmail(model.Email);
+            var result = await _emailService.SendPasswordResetEmail(model.Email);
 
             return result ? Ok() : BadRequest();
         }
@@ -227,9 +215,43 @@ namespace DocuAurora.API.Controllers
                 return BadRequest();
             }
 
-            var result = await _authService.ResetPassword(token, model.Password);
+            var result = await _emailService.ResetPassword(token, model.Password);
 
             return result.Succeeded ? Ok() : BadRequest(result.Errors.Select(e => e.Description));
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenViewModel model)
+        {
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var tokenS = handler.ReadToken(model.JWTToken) as JwtSecurityToken;
+
+            var userIdClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var storedRefreshToken = await _authService.GetStoredRefreshToken(user);
+            var dbToken = handler.ReadToken(storedRefreshToken);
+
+            if (dbToken.ValidTo <= DateTime.UtcNow)
+            {
+                return Unauthorized();
+            }
+
+            var newJwtToken = _authService.GenerateJwtToken(tokenS.Claims.ToList());
+            var newJwtTokenString = new JwtSecurityTokenHandler().WriteToken(newJwtToken);
+
+            return Ok(new { token = newJwtTokenString });
         }
 
     }

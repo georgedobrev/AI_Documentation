@@ -79,8 +79,10 @@
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
-            services.AddTransient<AuthService>();
+            services.AddTransient<EmailService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
+
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }
@@ -262,9 +264,9 @@
 
                 channelCreation.Value.QueueBind(queueMessage, exchange, routingMessageKey);
                 channelCreation.Value.QueueBind(queueFile, exchange, routingFileKey);
-
+              
                 channelCreation.Value.QueueDeclare("response");
-
+              
                 return channelCreation.Value;
             });
 
