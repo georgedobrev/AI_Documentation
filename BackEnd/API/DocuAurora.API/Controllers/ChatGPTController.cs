@@ -32,8 +32,16 @@ namespace DocuAurora.API.Controllers
         }
 
         // POST api/values
-        [HttpPost]
+        [HttpPost("createResumes")]
         public async Task<IActionResult> Post([FromBody] string value)
+        {
+
+            var result = await this._chatGPTService.GenerateResumeJSONChatGPT(value);
+            return Ok(result);
+        }
+
+        [HttpPost("askChatGPT")]
+        public async Task<IActionResult> AskChatGpt([FromBody] string value)
         {
 
             var result = await this._chatGPTService.GenerateResponseChatGPT(value);
