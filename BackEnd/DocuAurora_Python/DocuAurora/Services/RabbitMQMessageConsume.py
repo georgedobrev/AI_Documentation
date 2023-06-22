@@ -4,9 +4,6 @@ from pathlib import Path
 from Services.AnswerGeneratorService import AnswerGeneratorService
 
 
-# from Model.t5_model import local_llm
-
-
 def callbackMessage(ch, method, properties, body):
     data = json.loads(body.decode())
     command_name = data['CommandName']

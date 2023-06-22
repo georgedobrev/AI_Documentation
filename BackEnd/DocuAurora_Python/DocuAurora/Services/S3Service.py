@@ -33,16 +33,3 @@ class S3Service:
             self.s3.download_file(bucket_name, object_key, file_path)
             print(f"File '{object_key}' downloaded successfully.")
 
-    # def send_file(self, file_path):
-    #     try:
-    #         print("File sent successfully.")
-    #     except subprocess.CalledProcessError as e:
-    #         print(f"Error sending file: {e}")
-
-    # def process_files(self, bucket_name, object_keys):
-    #     for object_key in object_keys:
-    #         file_name = os.path.basename(object_key)
-    #         file_path = f"LOCAL_DIRECTORY/{file_name}"
-    #         self.download_file(bucket_name, object_key, file_path)
-    #         self.send_file(file_path)
-    #         os.remove(file_path)

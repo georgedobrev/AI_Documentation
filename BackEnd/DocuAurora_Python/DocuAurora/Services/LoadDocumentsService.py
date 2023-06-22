@@ -14,5 +14,3 @@ class LoadDocumentsService:
     def download_files(self, bucket_name, object_keys, file_path):
         self.s3_service.download_files(bucket_name, object_keys, file_path)
 
-    def unzip_files(self, file_path, extract_path):
-        self.s3_service.unzip_files(file_path, extract_path)
