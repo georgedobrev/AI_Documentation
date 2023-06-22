@@ -13,6 +13,6 @@
     {
         void SendMessage<T>(T message, string queue, string routingKey, string exchange = "DocuAurora-Exchange",  IBasicProperties properties = null);
 
-        Task ReceiveResponse<T>(string queue, IBasicProperties properties = null);
+        T ReceiveResponse<T>(string queue, IBasicProperties properties = null);
     }
 }
