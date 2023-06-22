@@ -30,7 +30,6 @@ namespace DocuAurora.Services.Data
             completionRequest.Prompt = inputText;
             completionRequest.Model = OpenAI_API.Models.Model.ChatGPTTurbo;
 
-            /// give instruction as System
             chat.AppendSystemMessage("You are a writer.");
 
             chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplate"], inputText));
