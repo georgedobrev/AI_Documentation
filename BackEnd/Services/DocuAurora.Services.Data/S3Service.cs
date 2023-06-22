@@ -52,7 +52,7 @@ namespace DocuAurora.Services.Data
             var request = new PutObjectRequest()
             {
                 BucketName = bucketName,
-                Key = file.FileName,
+                Key = $"{prefix}/{file.FileName}",
                 InputStream = file.OpenReadStream(),
             };
             request.Metadata.Add("Content-Type", file.ContentType);

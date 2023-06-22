@@ -8,6 +8,8 @@ namespace DocuAurora.Services.Data.Contracts
 {
     public interface IChatGPTService
     {
+        Task<string> GenerateResumeJSONChatGPT(string inputText);
+
         Task<string> GenerateResponseChatGPT(string inputText);
     }
 }

@@ -7,25 +7,18 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.chains import RetrievalQA
 import pinecone
 
+
 def setup_model(model_id):
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
     pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
     return HuggingFacePipeline(pipeline=pipe)
 
-def load_documents(pdf_path):
-    loader = PyPDFLoader(pdf_path)
-    return loader.load_and_split()
-
-def split_text(documents, chunk_size=1000, chunk_overlap=200):
-    text_splitter = CharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-    return text_splitter.split_documents(documents)
-
-def setup_pinecone(chunks, model_name, api_key, environment, index_name):
+def asking_existing_index(model_name, api_key, environment, index_name):
     embeddings = HuggingFaceInstructEmbeddings(model_name=model_name, model_kwargs={"device": "cpu"})
     pinecone.init(api_key=api_key, environment=environment)
-    pineconedb = Pinecone.from_documents(documents=chunks, embedding=embeddings, index_name=index_name)
-    return pineconedb.as_retriever(search_kwargs={"k": 2})
+    pineconedb = Pinecone.from_existing_index(index_name=index_name,embedding=embeddings)
+    return pineconedb.as_retriever(search_type="similarity", search_kwargs={"k":3})
 
 def asking_existing_index(chunks, model_name, api_key, environment, index_name):
     embeddings = HuggingFaceInstructEmbeddings(model_name=model_name, model_kwargs={"device": "cpu"})
@@ -38,11 +31,13 @@ def setup_retrieval_qa(local_llm, retriever):
 
 def ask_question(qa_chain, query):
     def process_llm_response(llm_response):
-        print(llm_response['result'])
-        print('\n\nSources:')
-        for source in llm_response["source_documents"]:
-            print(source.metadata['source'])
+        return llm_response['result']
+        # print('\n\nSources:')
+        # for source in llm_response["source_documents"]:
+        #     print(source.metadata['source'])
+
     llm_response = qa_chain(query)
-    process_llm_response(llm_response)
+    answer = process_llm_response(llm_response)
+    return  answer
 
    

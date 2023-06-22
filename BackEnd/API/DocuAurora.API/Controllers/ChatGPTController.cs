@@ -20,7 +20,7 @@ namespace DocuAurora.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = GlobalConstants.TrainerRoleName)]
+   // [Authorize(Roles = GlobalConstants.TrainerRoleName)]
 
     public class ChatGPTController : ControllerBase
     {
@@ -32,10 +32,20 @@ namespace DocuAurora.API.Controllers
         }
 
         // POST api/values
-        [HttpPost]
+        [HttpPost("createResumes")]
         public async Task<IActionResult> Post([FromBody] string value)
         {
-            return Ok(this._chatGPTService.GenerateResponseChatGPT(value));
+
+            var result = await this._chatGPTService.GenerateResumeJSONChatGPT(value);
+            return Ok(result);
+        }
+
+        [HttpPost("askChatGPT")]
+        public async Task<IActionResult> AskChatGpt([FromBody] string value)
+        {
+
+            var result = await this._chatGPTService.GenerateResponseChatGPT(value);
+            return Ok(result);
         }
 
     }

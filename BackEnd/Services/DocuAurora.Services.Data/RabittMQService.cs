@@ -1,10 +1,12 @@
-﻿using DocuAurora.Services.Data.Configurations;
+﻿using DocuAurora.API.ViewModels.RabittMQ;
+using DocuAurora.Services.Data.Configurations;
 using DocuAurora.Services.Data.Contracts;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,36 +21,44 @@ namespace DocuAurora.Services.Data
     public class RabittMQService : IRabbitMQService
     {
         private readonly IModel channel;
+        private readonly ConcurrentDictionary<string, EventingBasicConsumer> _consumer;
+        private readonly ConcurrentDictionary<string, BlockingCollection<object>> _blockingCollection;
 
         public RabittMQService(IModel channel)
         {
             this.channel = channel;
+            this._consumer = new ConcurrentDictionary<string, EventingBasicConsumer>();
+            this._blockingCollection = new ConcurrentDictionary<string, BlockingCollection<object>>();
         }
 
-        public async Task<string> ReceiveResponse(string queue, IBasicProperties properties = null)
+        public T ReceiveResponse<T>(string queue, IBasicProperties properties = null)
         {
-            var consumer = new EventingBasicConsumer(this.channel);
-            var tcs = new TaskCompletionSource<string>();
-
-            consumer.Received += (model, ea) =>
+            if (!this._consumer.ContainsKey(queue))
             {
-                var response = Encoding.UTF8.GetString(ea.Body.ToArray());
-                tcs.TrySetResult(response);
-            };
+                var consumer = new EventingBasicConsumer(this.channel);
+                consumer.Received += HandleMessageReceived;
 
-            this.channel.BasicConsume(queue, autoAck: true, consumer);
+                this.channel.BasicConsume(queue, autoAck: true, consumer: consumer);
 
-            // Wait for the response or a timeout
-            var responseTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30)));
-
-            if (responseTask == tcs.Task)
-            {
-                return tcs.Task.Result;
+                this._consumer[queue] = consumer;
+                this._blockingCollection[queue] = new BlockingCollection<object>();
             }
-            else
+
+            void HandleMessageReceived(object sender, BasicDeliverEventArgs eventArgs)
             {
-                throw new TimeoutException("No response received from RabbitMQ.");
+                var body = eventArgs.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                var item = JsonSerializer.Deserialize<T>(message);
+
+                this._blockingCollection[queue].Add(item);
             }
+
+            if (this._blockingCollection[queue].TryTake(out var item, TimeSpan.FromSeconds(60)))
+            {
+                return (T)item;
+            }
+
+            return default;
         }
 
         public void SendMessage<T>(T message, string queue, string routingKey, string exchange, IBasicProperties properties)

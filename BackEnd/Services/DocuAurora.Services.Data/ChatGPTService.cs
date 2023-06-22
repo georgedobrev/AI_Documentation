@@ -20,6 +20,25 @@ namespace DocuAurora.Services.Data
         }
 
 
+        public async Task<string> GenerateResumeJSONChatGPT(string inputText)
+        {
+            OpenAIAPI api = new OpenAIAPI(this._configuration["ChatGPTAPIkey"]);
+
+            var chat = api.Chat.CreateConversation();
+
+            CompletionRequest completionRequest = new CompletionRequest();
+            completionRequest.Prompt = inputText;
+            completionRequest.Model = OpenAI_API.Models.Model.ChatGPTTurbo;
+
+            chat.AppendSystemMessage("You are a writer.");
+
+            chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplate"], inputText));
+
+            string response = await chat.GetResponseFromChatbotAsync();
+
+            return response;
+        }
+
         public async Task<string> GenerateResponseChatGPT(string inputText)
         {
             OpenAIAPI api = new OpenAIAPI(this._configuration["ChatGPTAPIkey"]);
@@ -30,10 +49,9 @@ namespace DocuAurora.Services.Data
             completionRequest.Prompt = inputText;
             completionRequest.Model = OpenAI_API.Models.Model.ChatGPTTurbo;
 
-            /// give instruction as System
-            chat.AppendSystemMessage("You are a writer.");
+            chat.AppendSystemMessage("You are a answer provider.");
 
-            chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplate"], inputText));
+            chat.AppendUserInput(string.Format(this._configuration["ChatGPTtemplateAsk"], inputText));
 
             string response = await chat.GetResponseFromChatbotAsync();
 
