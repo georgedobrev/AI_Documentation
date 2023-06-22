@@ -1,6 +1,6 @@
 import json
 import os
-from pathlib import Path
+from pathlib import Path,PureWindowsPath
 
 from Services.LoadDocumentsService import LoadDocumentsService
 
@@ -16,17 +16,16 @@ def callbackFile(ch, method, properties, body):
     config_file_path = os.path.join(main_dir, 'config.ini')
     load_documents_service = LoadDocumentsService(config_file_path)
 
-    model_dir = os.path.join("BackEnd", "DocuAurora_Python", "DocuAurora", "Model")
+    filename = Path("BackEnd\DocuAurora_Python\DocuAurora\Model")
 
-    # Get the current working directory
-    current_dir = os.getcwd()
+    # Convert path to Windows format
+    path_on_windows = PureWindowsPath(filename)
 
-    # Construct the absolute path to the "Model" directory
-    model_abs_dir = os.path.join(current_dir, model_dir)
+    relative_path = os.path.abspath("BackEnd\DocuAurora_Python\DocuAurora\Model")
 
 
-    print(f'{bucket_name} -- {file_key} --- {model_abs_dir}')
-    load_documents_service.download_files(bucket_name, file_key, model_abs_dir)
-    load_documents_service.load_documents(model_abs_dir)
+    print(f'{bucket_name} -- {file_key} --- {path_on_windows}')
+    load_documents_service.download_files(bucket_name, file_key, path_on_windows)
+    # load_documents_service.load_documents(model_abs_dir)
 
-    print(model_abs_dir)
+    print("DOWNLOAD DONE")

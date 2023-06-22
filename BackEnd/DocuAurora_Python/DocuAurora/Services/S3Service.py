@@ -21,8 +21,13 @@ class S3Service:
 
     def download_files(self, bucket_name, object_keys, file_path):
         for object_key in object_keys:
-            file_path = os.path.join('..\Model', object_key)
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            directory_path = r'C:\Users\Milcho\OneDrive\Desktop\Blank\AI_Documentation\BackEnd\DocuAurora_Python\DocuAurora\Model'
+
+            print(directory_path)
+            print("testtst MILCHo")
+            print(file_path)
+
+            file_path = os.path.join( directory_path, object_key)
 
             print(file_path)
             self.s3.download_file(bucket_name, object_key, file_path)
