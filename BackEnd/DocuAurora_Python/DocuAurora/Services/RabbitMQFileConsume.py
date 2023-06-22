@@ -16,16 +16,14 @@ def callbackFile(ch, method, properties, body):
     config_file_path = os.path.join(main_dir, 'config.ini')
     load_documents_service = LoadDocumentsService(config_file_path)
 
-    filename = Path("BackEnd\DocuAurora_Python\DocuAurora\Model")
+    filename = PureWindowsPath("C:\\Users\\Milcho\\OneDrive\\Desktop\\Blank\\AI_Documentation\\BackEnd\\DocuAurora_Python\\DocuAurora\\Model")
 
-    # Convert path to Windows format
-    path_on_windows = PureWindowsPath(filename)
-
-    relative_path = os.path.abspath("BackEnd\DocuAurora_Python\DocuAurora\Model")
+    # Convert path to the right format for the current operating system
+    correct_path = Path(filename)
 
 
-    print(f'{bucket_name} -- {file_key} --- {path_on_windows}')
-    load_documents_service.download_files(bucket_name, file_key, path_on_windows)
+    print(f'{bucket_name} -- {file_key} --- {correct_path}')
+    load_documents_service.download_files(bucket_name, file_key, correct_path)
     # load_documents_service.load_documents(model_abs_dir)
 
     print("DOWNLOAD DONE")
