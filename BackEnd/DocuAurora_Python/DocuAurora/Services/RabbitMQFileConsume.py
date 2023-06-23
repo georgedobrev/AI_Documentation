@@ -20,7 +20,6 @@ def callbackFile(ch, method, properties, body):
 
     correct_path = Path(filename)
 
-    print(f'{bucket_name} -- {file_key} --- {correct_path}')
     load_documents_service.download_files(bucket_name, file_key, correct_path)
     # load_documents_service.load_documents(model_abs_dir)
 

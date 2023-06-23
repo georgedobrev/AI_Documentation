@@ -21,15 +21,11 @@ class S3Service:
 
     def download_files(self, bucket_name, object_keys, file_path):
         for object_key in object_keys:
-            # directory_path = r'C:\Users\Milcho\OneDrive\Desktop\Blank\AI_Documentation\BackEnd\DocuAurora_Python\DocuAurora\Model'
-
-            # print(directory_path)
-            print(file_path)
+            directory_path = r'/Users/Milcho.Kasmetov/Documents/Practice/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model'
 
             # file_path = os.path.join( directory_path, object_key)
-            file_path = os.path.join( file_path, object_key)
+            file_path = os.path.join( directory_path, object_key)
 
-            print(file_path)
             self.s3.download_file(bucket_name, object_key, file_path)
             print(f"File '{object_key}' downloaded successfully.")
 

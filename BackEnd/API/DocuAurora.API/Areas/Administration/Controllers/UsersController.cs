@@ -19,7 +19,7 @@ namespace DocuAurora.API.Areas.Administration.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(Roles = GlobalConstants.AdministratorRoleName)]
+    [Authorize(Roles = GlobalConstants.AdministratorRoleName)]
 
     public class UsersController : ControllerBase
     {
