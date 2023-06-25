@@ -60,6 +60,5 @@ namespace DocuAurora.API.Infrastructure
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(json);
         }
-
     }
 }
