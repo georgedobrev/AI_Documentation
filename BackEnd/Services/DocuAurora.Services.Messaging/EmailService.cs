@@ -1,4 +1,5 @@
-﻿using DocuAurora.Data.Models;
+﻿using DocuAurora.Common;
+using DocuAurora.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ namespace DocuAurora.Services.Messaging
 
             if (result.Succeeded)
             {
+                await this._userManager.AddToRoleAsync(user, GlobalConstants.UserRoleName);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user.Id};{code}"));
                 var callbackUrl = $"https://localhost:44319/confirmemail?token={token}";
