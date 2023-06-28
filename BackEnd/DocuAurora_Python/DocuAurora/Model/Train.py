@@ -10,12 +10,13 @@ df = df[['source_text', 'target_text']]
 
 print(f"Train dataset size: {len(df['source_text'])}")
 
-# Set up paths and load the model
+
 base_model = "google/flan-t5-base"
 save_dir = "./saved_model"
 model_path = save_dir if os.path.exists(save_dir) else base_model
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(base_model)
+
 
 dataset = Dataset.from_pandas(df)
 
@@ -42,7 +43,7 @@ training_args = Seq2SeqTrainingArguments(
     save_strategy="epoch",
 )
 
-data_collator = DataCollatorForSeq2Seq(tokenizer,model)
+data_collator = DataCollatorForSeq2Seq(tokenizer, model)
 
 # Step 5: Create the Trainer
 trainer = Seq2SeqTrainer(

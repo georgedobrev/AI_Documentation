@@ -17,7 +17,7 @@ def setup_model(model_id):
 def asking_existing_index(model_name, api_key, environment, index_name):
     embeddings = HuggingFaceInstructEmbeddings(model_name=model_name, model_kwargs={"device": "cpu"})
     pinecone.init(api_key=api_key, environment=environment)
-    pineconedb = Pinecone.from_existing_index(index_name=index_name,embedding=embeddings)
+    pineconedb = Pinecone.from_existing_index(index_name=index_name, embedding=embeddings)
     return pineconedb.as_retriever(search_type="similarity", search_kwargs={"k":3})
 
 def setup_retrieval_qa(local_llm, retriever):
