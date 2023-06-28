@@ -77,7 +77,6 @@
             services.AddTransient<IEmailSender>(i =>
           new SendGridEmailSender(configuration.GetValue<string>("SendGridSettings:SendGridApiKey")));
             services.AddTransient<IAdminService, AdminService>();
-            services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<IChatGPTService, ChatGPTService>();
             services.AddTransient<EmailService>();
             services.AddTransient<GlobalExceptionHandlingMiddleware>();
