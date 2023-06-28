@@ -31,9 +31,7 @@ namespace DocuAurora.Services.Data.Tests
             var user = new ApplicationUser { UserName = UserName, Email = emailTest };
             var result = await _userManager.CreateAsync(user, GlobalConstants.UserPassword);
 
-            await SeedRoleAsync(_roleManager, GlobalConstants.AdministratorRoleName);
             await SeedRoleAsync(_roleManager, GlobalConstants.UserRoleName);
-            await SeedRoleAsync(_roleManager, GlobalConstants.TrainerRoleName);
 
             await this._userManager.AddToRoleAsync(user, GlobalConstants.UserRoleName);
 
@@ -42,6 +40,23 @@ namespace DocuAurora.Services.Data.Tests
             Assert.Single(list);
             Assert.Equal(UserName, list.FirstOrDefault(x => x.UserName == UserName).UserName);
         }
+
+        [Fact]
+        public async Task GetUserAsyncSuccessfully()
+        {
+            var user = new ApplicationUser { UserName = UserName, Email = emailTest };
+            var result = await _userManager.CreateAsync(user, GlobalConstants.UserPassword);
+
+            await SeedRoleAsync(_roleManager, GlobalConstants.UserRoleName);
+
+            await this._userManager.AddToRoleAsync(user, GlobalConstants.UserRoleName);
+
+            var userOutput = await this.AdminServiceMoq.GetUserAsync(user.Id);
+
+            Assert.Equal(UserName, userOutput.UserName);
+            Assert.Equal(emailTest, userOutput.Email);
+        }
+
 
         private static async Task SeedRoleAsync(Microsoft.AspNetCore.Identity.RoleManager<ApplicationRole> roleManager, string roleName)
         {
