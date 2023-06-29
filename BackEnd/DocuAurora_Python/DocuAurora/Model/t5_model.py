@@ -52,7 +52,8 @@ def ask_question(qa_chain, query):
     return answer
 
 
-local_llm = setup_model_wizardvicuna('ehartford/Wizard-Vicuna-7B-Uncensored')
+local_llm = setup_model_wizardvicuna('ehartford/Wizard-Vicuna-7B-Uncensored') #chose one
+local_llm = setup_model_flan('google/flan-t5-base') # chose one
 
 retriever = asking_existing_index("hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free',
                                    "test")
