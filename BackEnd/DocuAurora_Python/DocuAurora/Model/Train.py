@@ -1,106 +1,142 @@
-import os
-import pandas as pd
-from transformers import T5ForConditionalGeneration, AutoTokenizer, DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments
-from datasets import Dataset
-from transformers import pipeline
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq
+from datasets import concatenate_datasets
+from huggingface_hub import HfFolder
+from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 
-# Load your dataset
-dataset = pd.read_csv("./news_summary.csv", encoding='latin-1', usecols=['headlines', 'text'])
-dataset = dataset.rename(columns={"headlines":"target_text", "text":"source_text"})
+import evaluate
+import nltk
+import numpy as np
+from nltk.tokenize import sent_tokenize
+nltk.download("punkt")
 
-# Model names and paths
-qmodel_name = "ThomasSimonini/t5-end2end-question-generation"
-amodel_name = "deepset/roberta-base-squad2"
-base_model = "google/flan-t5-base"
-save_dir = "./saved_model"
+dataset_id = "xsum"
+# Load dataset from the hub
+dataset = load_dataset(dataset_id)
 
-# Load models and tokenizers
-qmodel = T5ForConditionalGeneration.from_pretrained(qmodel_name)
-qtokenizer = AutoTokenizer.from_pretrained(base_model)
-amodel = pipeline('question-answering', model=amodel_name, tokenizer=amodel_name)
-model_path = save_dir if os.path.exists(save_dir) else base_model
-model = T5ForConditionalGeneration.from_pretrained(model_path)
-tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-# Question generation function
-def run_qmodel(input_string, **generator_args):
-    generator_args = {
-        "max_length": 256,
-        "num_beams": 4,
-        "length_penalty": 1.5,
-        "no_repeat_ngram_size": 3,
-        "early_stopping": True,
-    }
-    input_string = "generate questions: " + input_string + " </s>"
-    input_ids = qtokenizer.encode(input_string, return_tensors="pt")
-    res = qmodel.generate(input_ids, **generator_args)
-    output = qtokenizer.batch_decode(res, skip_special_tokens=True)
-    output = [item.split("? ") for item in output]
-    output = output[0]
-    return output
+print(f"Train dataset size: {len(dataset['train'])}")
+print(f"Test dataset size: {len(dataset['test'])}")
 
-qa_pairs = []
-for index, row in dataset.iterrows():
-    source_text = row["source_text"]
-    print(f"Generating questions for text {index+1}/{len(dataset)}...")
-    questions = run_qmodel(source_text)
-    for question in questions:
-        print(f"Answering question: {question}")
-        # Generate an answer based on the question and the source text
-        answer = amodel(question=question, context=source_text)
-        qa_pairs.append({"question": question, "answer": answer["answer"]})
+model_id="google/flan-t5-base"
 
-# Prepare the new dataframe for training
-df = pd.DataFrame(qa_pairs)
-print(f"Finished generating questions and answers. Preparing for training...")
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
 
-dataset = Dataset.from_pandas(df)
+# Load tokenizer of FLAN-t5-base
+tokenizer = AutoTokenizer.from_pretrained(model_id)
 
-# Preprocess function
-def preprocess_function(examples):
-    inputs = examples["question"]
-    targets = examples["answer"]
-    model_inputs = tokenizer(inputs, padding="max_length", truncation=True)
+# The maximum total input sequence length after tokenization.
+# Sequences longer than this will be truncated, sequences shorter will be padded.
+tokenized_inputs = concatenate_datasets([dataset["train"], dataset["test"]]).map(lambda x: tokenizer(x["document"], truncation=True), batched=True, remove_columns=["document", "summary"])
+max_source_length = max([len(x) for x in tokenized_inputs["input_ids"]])
+print(f"Max source length: {max_source_length}")
 
-    with tokenizer.as_target_tokenizer():
-        labels = tokenizer(targets, max_length=512, truncation=True)
+# The maximum total sequence length for target text after tokenization.
+# Sequences longer than this will be truncated, sequences shorter will be padded."
+tokenized_targets = concatenate_datasets([dataset["train"], dataset["test"]]).map(lambda x: tokenizer(x["summary"], truncation=True), batched=True, remove_columns=["document", "summary"])
+max_target_length = max([len(x) for x in tokenized_targets["input_ids"]])
+print(f"Max target length: {max_target_length}")
+
+def preprocess_function(sample,padding="max_length"):
+    # add prefix to the input for t5
+    inputs = ["summarize: " + item for item in sample["document"]]
+
+    # tokenize inputs
+    model_inputs = tokenizer(inputs, max_length=max_source_length, padding=padding, truncation=True)
+
+    # Tokenize targets with the `text_target` keyword argument
+    labels = tokenizer(text_target=sample["summary"], max_length=max_target_length, padding=padding, truncation=True)
+
+    # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
+    # padding in the loss.
+    if padding == "max_length":
+        labels["input_ids"] = [
+            [(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]
+        ]
 
     model_inputs["labels"] = labels["input_ids"]
     return model_inputs
 
-print("Mapping preprocess function to the dataset...")
-# Map the preprocess function to the dataset
-train_dataset = dataset.map(preprocess_function, batched=True)
+tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_columns=["document", "summary", "id"])
+print(f"Keys of tokenized dataset: {list(tokenized_dataset['train'].features)}")
 
-# Training arguments
-training_args = Seq2SeqTrainingArguments(
-    output_dir="./output",
-    num_train_epochs=5,
-    per_device_train_batch_size=8,
-    learning_rate=1e-4,
-    save_strategy="epoch",
-)
+# Metric
+metric = evaluate.load("rouge")
 
+# helper function to postprocess text
+def postprocess_text(preds, labels):
+    preds = [pred.strip() for pred in preds]
+    labels = [label.strip() for label in labels]
+
+    # rougeLSum expects newline after each sentence
+    preds = ["\n".join(sent_tokenize(pred)) for pred in preds]
+    labels = ["\n".join(sent_tokenize(label)) for label in labels]
+
+    return preds, labels
+
+def compute_metrics(eval_preds):
+    preds, labels = eval_preds
+    if isinstance(preds, tuple):
+        preds = preds[0]
+    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+    # Replace -100 in the labels as we can't decode them.
+    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
+    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+    # Some simple post-processing
+    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+
+    result = metric.compute(predictions=decoded_preds, references=decoded_labels, use_stemmer=True)
+    result = {k: round(v * 100, 4) for k, v in result.items()}
+    prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+    result["gen_len"] = np.mean(prediction_lens)
+    return result
+
+# we want to ignore tokenizer pad token in the loss
+label_pad_token_id = -100
 # Data collator
-data_collator = DataCollatorForSeq2Seq(tokenizer, model)
-
-print("Setting up trainer...")
-# Trainer
-trainer = Seq2SeqTrainer(
-    model,
-    training_args,
-    train_dataset=train_dataset,
-    data_collator=data_collator,
-    tokenizer=tokenizer
+data_collator = DataCollatorForSeq2Seq(
+    tokenizer,
+    model=model,
+    label_pad_token_id=label_pad_token_id,
+    pad_to_multiple_of=8
 )
 
-print("Starting training...")
-# Start training
-trainer.train()
+# Hugging Face repository id
+repository_id = f"{model_id.split('/')[1]}-{dataset_id}"
 
-print("Training finished. Saving the model...")
-# Save the model
-os.makedirs(save_dir, exist_ok=True)
-model.save_pretrained(save_dir)
-tokenizer.save_pretrained(save_dir)
-print("Model saved.")
+# Define training args
+training_args = Seq2SeqTrainingArguments(
+    output_dir=repository_id,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    predict_with_generate=True,
+    fp16=False, # Overflows with fp16
+    learning_rate=5e-5,
+    num_train_epochs=5,
+    # logging & evaluation strategies
+    logging_dir=f"{repository_id}/logs",
+    logging_strategy="steps",
+    logging_steps=500,
+    evaluation_strategy="epoch",
+    save_strategy="epoch",
+    save_total_limit=2,
+    load_best_model_at_end=True,
+    # metric_for_best_model="overall_f1",
+    # push to hub parameters
+    report_to="tensorboard",
+    push_to_hub=False,
+    hub_strategy="every_save",
+    hub_model_id=repository_id,
+    hub_token=HfFolder.get_token(),
+)
+
+# Create Trainer instance
+trainer = Seq2SeqTrainer(
+    model=model,
+    args=training_args,
+    data_collator=data_collator,
+    train_dataset=tokenized_dataset["train"],
+    eval_dataset=tokenized_dataset["test"],
+    compute_metrics=compute_metrics,
+)
