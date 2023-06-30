@@ -16,7 +16,7 @@ def callbackMessage(ch, method, properties, body):
     config_file_path = os.path.join(main_dir, 'config.ini')
 
     answer_generator = AnswerGeneratorService(config_file_path)
-    answer_generator.load_existing_index()
+    answer_generator.load_existing_index(command_name)
     answer = answer_generator.generate_answer(input_question)
 
     print(answer)
