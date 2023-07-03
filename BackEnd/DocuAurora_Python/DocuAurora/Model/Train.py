@@ -109,6 +109,7 @@ repository_id = f"{model_id.split('/')[1]}-{dataset_id}"
 # Define training args
 training_args = Seq2SeqTrainingArguments(
     output_dir='./output',
+    use_mps_device=True,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     predict_with_generate=True,
