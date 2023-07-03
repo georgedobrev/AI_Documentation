@@ -60,6 +60,7 @@ def preprocess_function(sample,padding="max_length"):
 tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_columns=["document", "summary", "id"])
 print(f"Keys of tokenized dataset: {list(tokenized_dataset['train'].features)}")
 
+save_dir = "./saved_model"
 # Metric
 metric = evaluate.load("rouge")
 
@@ -107,7 +108,7 @@ repository_id = f"{model_id.split('/')[1]}-{dataset_id}"
 
 # Define training args
 training_args = Seq2SeqTrainingArguments(
-    output_dir=repository_id,
+    output_dir='./output',
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     predict_with_generate=True,
@@ -115,7 +116,7 @@ training_args = Seq2SeqTrainingArguments(
     learning_rate=5e-5,
     num_train_epochs=5,
     # logging & evaluation strategies
-    logging_dir=f"{repository_id}/logs",
+    logging_dir=f"{save_dir}/logs",
     logging_strategy="steps",
     logging_steps=500,
     evaluation_strategy="epoch",
@@ -124,11 +125,6 @@ training_args = Seq2SeqTrainingArguments(
     load_best_model_at_end=True,
     # metric_for_best_model="overall_f1",
     # push to hub parameters
-    report_to="tensorboard",
-    push_to_hub=False,
-    hub_strategy="every_save",
-    hub_model_id=repository_id,
-    hub_token=HfFolder.get_token(),
 )
 
 # Create Trainer instance
@@ -140,3 +136,11 @@ trainer = Seq2SeqTrainer(
     eval_dataset=tokenized_dataset["test"],
     compute_metrics=compute_metrics,
 )
+
+# Start training
+trainer.train()
+
+trainer.evaluate()
+
+tokenizer.save_pretrained(save_dir)
+trainer.create_model_card(save_dir)
