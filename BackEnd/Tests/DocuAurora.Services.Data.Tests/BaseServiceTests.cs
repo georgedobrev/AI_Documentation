@@ -10,6 +10,7 @@
     using DocuAurora.Data.Common.Repositories;
     using DocuAurora.Data.Models;
     using DocuAurora.Data.Repositories;
+    using DocuAurora.Services.Data.Contracts;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@
 
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IAuthService, AuthService>();
 
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<UserManager<ApplicationUser>>();
