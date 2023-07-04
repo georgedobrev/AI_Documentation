@@ -10,7 +10,7 @@ import numpy as np
 from nltk.tokenize import sent_tokenize
 nltk.download("punkt")
 
-dataset_id = "xsum"
+dataset_id = "iohadrubin/mini_xsum"
 # Load dataset from the hub
 dataset = load_dataset(dataset_id)
 
@@ -60,7 +60,7 @@ def preprocess_function(sample,padding="max_length"):
 tokenized_dataset = dataset.map(preprocess_function, batched=True, remove_columns=["document", "summary", "id"])
 print(f"Keys of tokenized dataset: {list(tokenized_dataset['train'].features)}")
 
-save_dir = "./saved_model"
+save_dir = "output/saved_model"
 # Metric
 metric = evaluate.load("rouge")
 
