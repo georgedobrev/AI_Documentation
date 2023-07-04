@@ -32,10 +32,8 @@ if __name__ == '__main__':
     rabbitmq_service.consume_messages(queue_callbacks)
 
     # local_llm = setup_model('google/flan-t5-base')
-    # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Bulgaria.pdf')
-    # documents = load_documents('C:/C# - learning/AI_Documentation/BackEnd/DocuAurora_Python/DocuAurora/Model/Test2.pdf')
-    # chunks = split_text(documents)
-    # retriever = setup_pinecone(chunks, "hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test2")
+
+    # retriever = asking_existing_index("hkunlp/instructor-xl", 'b4b7947c-96fd-4c95-9785-9c8ced03b64b', 'us-west1-gcp-free', "test")
     # qa_chain = setup_retrieval_qa(local_llm, retriever)
     #
     # # Asking Questions
