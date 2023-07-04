@@ -3,17 +3,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace DocuAurora.Services.Data.Tests
 {
-    public class AuthServiceTest : BaseServiceTests
+    public class AuthServiceTests : BaseServiceTests
     {
         private Mock<UserManager<ApplicationUser>> _mockUserManager;
         private Mock<IConfiguration> _mockConfiguration;
 
-        public AuthServiceTest()
+        public AuthServiceTests()
         {
             _mockUserManager = new Mock<UserManager<ApplicationUser>>(
                 new Mock<IUserStore<ApplicationUser>>().Object,
@@ -49,6 +51,29 @@ namespace DocuAurora.Services.Data.Tests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public void Test_GenerateJwtToken()
+        {
+            // Arrange
+            var authService = new AuthService(_mockUserManager.Object, _mockConfiguration.Object);
+            var claims = new List<Claim>()
+    {
+        new Claim(ClaimTypes.NameIdentifier, "TestUserId"),
+        new Claim(ClaimTypes.Name, "TestUsername"),
+    };
+
+            // Act
+            var jwtToken = authService.GenerateJwtToken(claims);
+
+            // Assert
+            Assert.NotNull(jwtToken);
+            Assert.Equal("BestSecretTestIssuer", jwtToken.Issuer);
+            Assert.Single(jwtToken.Audiences, audience => audience == "BestSecretyourTestAudience");
+            Assert.True(jwtToken.ValidTo > DateTime.UtcNow && jwtToken.ValidTo < DateTime.UtcNow.AddMinutes(16));
+            Assert.Contains(jwtToken.Claims, claim => claim.Type == ClaimTypes.NameIdentifier && claim.Value == "TestUserId");
+            Assert.Contains(jwtToken.Claims, claim => claim.Type == ClaimTypes.Name && claim.Value == "TestUsername");
         }
 
     }
