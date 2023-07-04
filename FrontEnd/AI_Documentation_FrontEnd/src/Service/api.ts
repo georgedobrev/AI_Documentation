@@ -1,61 +1,75 @@
 import axios, { AxiosResponse } from 'axios';
 
-const BASE_URL = "https://localhost:43658/api"; 
+const BASE_URL = "https://localhost:43658/api";
 
 const instance = axios.create({
-    baseURL: BASE_URL,
+  baseURL: BASE_URL,
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+  }
 });
+
+const setBearerToken = (token: string): void => {
+  localStorage.setItem('token', `Bearer ${token}`);
+};
+
 
 interface RegisterData {
     username: string;
     email: string;
     password: string;
-}
-
-interface LoginData {
+  }
+  
+  interface LoginData {
     username: string;
     password: string;
-}
-
-interface UserResponse {
+  }
+  
+  interface User {
     username: string;
-    password: string;
     email: string;
-}
-
-interface ForgotPasswordData {
+  }
+  
+  interface ForgotPasswordData {
     email: string;
-}
-
-interface ForgotPasswordResponse {
+  }
+  
+  interface ForgotPasswordResponse {
     message: string;
-}
-
-export const registerUser = async (data: RegisterData): Promise<UserResponse> => {
-    const response: AxiosResponse<UserResponse> = await instance.post('/Account/register', data);
+  }
+  
+  interface TokenResponse {
+    token: string;
+  }
+  
+  export const registerUser = async (data: RegisterData): Promise<TokenResponse> => {
+    const response: AxiosResponse<TokenResponse> = await instance.post('/Account/register', data);
+    setBearerToken(response.data.token);
     return response.data;
-};
-
-export const loginUser = async (data: LoginData): Promise<UserResponse> => {
-    const response: AxiosResponse<UserResponse> = await instance.post('/Account/login', data);
+  };
+  
+  export const loginUser = async (data: LoginData): Promise<TokenResponse> => {
+    const response: AxiosResponse<TokenResponse> = await instance.post('/Account/login', data);
+    setBearerToken(response.data.token);
     return response.data;
-};
-
-export const sendResetPasswordLink = async (data: ForgotPasswordData): Promise<ForgotPasswordResponse> => {
-    const response: AxiosResponse<ForgotPasswordResponse> = await instance.post('/Account/forgot-password', data);
+  };
+  
+  export const sendResetPasswordLink = async (data: ForgotPasswordData): Promise<ForgotPasswordResponse> => {
+    const response: AxiosResponse<ForgotPasswordResponse> = await instance.post('/Account/ForgotPassword', data);
     return response.data;
-};
- 
-export const sendGoogleToken = async (tokenId: string) => {
-    const response = await axios.post(`${BASE_URL}/api/Account/GoogleResponse`, { tokenId });
-
+  };
+  
+  export const sendGoogleToken = async (tokenId: string): Promise<TokenResponse> => {
+    const response: AxiosResponse<TokenResponse> = await instance.post(`${BASE_URL}/Account/GoogleResponse`, { tokenId });
+    setBearerToken(response.data.token);
     return response.data;
-};
-
-export const resetPassword = async (email: string) => {
-    const response = await axios.post("/api/Account/ResetPassword", { email });
+  };
+  
+  export const resetPassword = async (email: string) => {
+    const response = await instance.post("/Account/ResetPassword", { email });
     if (response.status !== 200) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
     return response.data;
   };
+  
