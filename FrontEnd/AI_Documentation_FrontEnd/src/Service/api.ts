@@ -9,6 +9,11 @@ const instance = axios.create({
   }
 });
 
+const setBearerToken = (token: string): void => {
+  localStorage.setItem('token', `Bearer ${token}`);
+};
+
+
 interface RegisterData {
     username: string;
     email: string;
@@ -39,13 +44,13 @@ interface RegisterData {
   
   export const registerUser = async (data: RegisterData): Promise<TokenResponse> => {
     const response: AxiosResponse<TokenResponse> = await instance.post('/Account/register', data);
-    localStorage.setItem('token', `Bearer ${response.data.token}`);
+    setBearerToken(response.data.token);
     return response.data;
   };
   
   export const loginUser = async (data: LoginData): Promise<TokenResponse> => {
     const response: AxiosResponse<TokenResponse> = await instance.post('/Account/login', data);
-    localStorage.setItem('token', `Bearer ${response.data.token}`);
+    setBearerToken(response.data.token);
     return response.data;
   };
   
@@ -56,7 +61,7 @@ interface RegisterData {
   
   export const sendGoogleToken = async (tokenId: string): Promise<TokenResponse> => {
     const response: AxiosResponse<TokenResponse> = await instance.post(`${BASE_URL}/Account/GoogleResponse`, { tokenId });
-    localStorage.setItem('token', `Bearer ${response.data.token}`);
+    setBearerToken(response.data.token);
     return response.data;
   };
   
