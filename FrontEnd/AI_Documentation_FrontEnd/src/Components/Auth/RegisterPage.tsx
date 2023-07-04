@@ -39,10 +39,8 @@ function RegisterPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const data = await registerUser(values);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', `Bearer ${data.token}`);
-        navigate("/");
+       await registerUser(values);
+        navigate("/login");
       } catch (error) {
         console.error(error);
       }
@@ -51,16 +49,17 @@ function RegisterPage() {
 
   const responseGoogle = async (response: GoogleResponse) => {
     if ("tokenId" in response) {
+      
       try {
-        const data = await sendGoogleToken(response.tokenId);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', `Bearer ${data.token}`);
-        navigate("/");
+        await sendGoogleToken(response.tokenId);
+        navigate("/login");
       } catch (error) {
         console.error(error);
       }
     }
   };
+  
+ 
 
   const renderGoogleLoginButton = () => (
     <GoogleLogin

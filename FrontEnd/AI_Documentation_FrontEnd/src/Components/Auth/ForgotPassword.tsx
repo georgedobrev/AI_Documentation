@@ -19,8 +19,7 @@ function ForgotPasswordPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const user = await sendResetPasswordLink(values);
-        //todo
+       await sendResetPasswordLink(values);
       } catch (error) {
         console.error(error);
       }

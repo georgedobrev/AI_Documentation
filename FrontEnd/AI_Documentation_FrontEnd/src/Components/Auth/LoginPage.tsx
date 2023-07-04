@@ -27,13 +27,10 @@ const validationSchema = Yup.object({
 
 function LoginPage() {
   const navigate = useNavigate();
-
   const responseGoogle = async (response: GoogleResponse) => {
     if ("tokenId" in response) {
       try {
-        const data = await sendGoogleToken(response.tokenId);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', `Bearer ${data.token}`);
+        await sendGoogleToken(response.tokenId);
         navigate("/");
       } catch (error) {
         console.error(error);
@@ -49,10 +46,9 @@ function LoginPage() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const data = await loginUser(values);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', `Bearer ${data.token}`);
+      await loginUser(values);
         navigate("/");
+       
       } catch (error) {
         console.error(error);
       }
@@ -133,3 +129,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
