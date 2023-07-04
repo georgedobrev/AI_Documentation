@@ -19,7 +19,12 @@ namespace DocuAurora.Services.Data.Tests
                 new Mock<IUserStore<ApplicationUser>>().Object,
                 null, null, null, null, null, null, null, null
             );
+
             _mockConfiguration = new Mock<IConfiguration>();
+
+            _mockConfiguration.Setup(c => c[It.Is<string>(s => s == "JwtSettings:SecretKey")]).Returns("BestSecretTestSecretKey");
+            _mockConfiguration.Setup(c => c[It.Is<string>(s => s == "JwtSettings:Issuer")]).Returns("BestSecretTestIssuer");
+            _mockConfiguration.Setup(c => c[It.Is<string>(s => s == "JwtSettings:Audience")]).Returns("BestSecretyourTestAudience");
         }
 
         [Fact]
@@ -45,5 +50,6 @@ namespace DocuAurora.Services.Data.Tests
                 It.IsAny<string>(),
                 It.IsAny<string>()), Times.Once);
         }
+
     }
 }
