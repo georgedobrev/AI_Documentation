@@ -1,26 +1,48 @@
+
 @import './global.css';
-
+ 
+body {
+  font-family: 'Arial', sans-serif;
+}
+ 
 .App {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(to right, var(--main-bg-color-start), var(--main-bg-color-middle), var(--main-bg-color-end));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(to right, var(--main-bg-color-start), var(--main-bg-color-middle), var(--main-bg-color-end));
 }
-
+ 
 .main-page {
-    width: 50%;
-    height: 80%;
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  width: 50%;
+  height: 80%;
+  background: var(--body-bg-color);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-
+ 
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+ 
+.header-logo-large {
+  width: 150px;
+  height: 100px;
+  margin-right: 10px;
+}
+ 
+.header-title {
+  font-size: 1.5em;
+  color: #333;
+}
+ 
 .chat-window {
     flex-grow: 1;
     overflow-y: auto;
@@ -28,37 +50,79 @@
     border: 1px solid #ccc;
     border-radius: 10px;
     margin-bottom: 20px;
-}
-
+    height: 310%; /* This increases the size of the chat window to 90% of its parent container */
+    width: 90%; /* This increases the width of the chat window to 90% of its parent container */
+  }
+  
+ 
 .message {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
 }
-
+ 
 .message.GPT {
-    background: #eee;
-    align-self: flex-start;
+  background: #eee;
+  align-self: flex-start;
+  border: 1px solid #ddd;
 }
-
+ 
 .message-input-form {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
-
+ 
 .message-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
-
+ 
 .submit-button {
-    margin-left: 10px;
-    padding: 10px 20px;
-    background: var(--login-button-bg-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  margin-left: 10px;
+  padding: 10px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
+ 
+.submit-button:hover {
+  background: #2980b9;
+}
+ 
+ 
+  .sidebar {
+    width: 300px; /* Adjust as needed */
+    background-color: #f8f9fa;
+    height: 87.5vh; /* This will make the sidebar take the full height of the viewport */
+    padding: 20px; /* Adjust as needed */
+    box-sizing: border-box;
+    margin-right: 40px; /* Add margin to the right side of the sidebar */
+    margin-left: 180px;
+    border-radius: 20px; /* Adjust this value to change the roundness of the corners */
+ 
+  }
+ 
+  .main-page {
+    flex-grow: 1; /* This will make the main page take the remaining space after the sidebar */
+    margin-right: 300px; /* Add margin to the right side of the main page */
+    margin-left: 350px;
+  }
+
+  .logo {
+    position: fixed; /* fixed positioning is relative to the viewport */
+    top: 38px; 
+    left: 690px; 
+    width: 150px;
+    height: 100px;
+  }
+
+  .chat-area {
+    position: relative;
+    padding-top: 50px; /* This creates space for the logo at the top */
+    padding-left: 40px; /* This creates space for the logo at the left */
+  }
