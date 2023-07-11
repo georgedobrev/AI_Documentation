@@ -53,7 +53,7 @@ namespace DocuAurora.Services.Data
                 this._blockingCollection[queue].Add(item);
             }
 
-            if (this._blockingCollection[queue].TryTake(out var item, TimeSpan.FromSeconds(60)))
+            if (this._blockingCollection[queue].TryTake(out var item, TimeSpan.FromSeconds(600)))
             {
                 return (T)item;
             }

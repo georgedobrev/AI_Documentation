@@ -42,9 +42,9 @@ class AnswerGeneratorService:
                                                self.index_name)
 
         if inputModel == 'FlanT5':
-            final_local_llm = self.local_llm_FlanT5
+            self.final_local_llm = self.local_llm_FlanT5
         elif inputModel == 'Wizzard':
-            final_local_llm = self.local_llm_Wizzard
+            self.final_local_llm = self.local_llm_Wizzard
 
         self.qa_chain = setup_retrieval_qa(self.final_local_llm, self.retriever)
         
