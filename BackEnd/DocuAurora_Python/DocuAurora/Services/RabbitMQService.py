@@ -11,10 +11,10 @@ class RabbitMQService:
         self.connection = None
         self.channel = None
         self.exchange_name = self._get_config_value('RabbitMQ', 'exchange_name')
-        self.message_queue_name =self._get_config_value('RabbitMQ', 'message_queue_name')
-        self.file_queue_name =self._get_config_value('RabbitMQ', 'file_queue_name')
+        self.message_queue_name = self._get_config_value('RabbitMQ', 'message_queue_name')
+        self.file_queue_name = self._get_config_value('RabbitMQ', 'file_queue_name')
         self.message_routing_key = self._get_config_value('RabbitMQ', 'message_routing_key')
-        self.file_routing_key =self._get_config_value('RabbitMQ', 'file_routing_key')
+        self.file_routing_key = self._get_config_value('RabbitMQ', 'file_routing_key')
 
     def _get_config_value(self, section, key):
         config = configparser.ConfigParser()

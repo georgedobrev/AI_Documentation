@@ -129,7 +129,7 @@ namespace DocuAurora.API.Controllers
 
         [HttpPost]
         [Route("GoogleResponse")]
-        public async Task<IActionResult> GoogleResponse([FromBody] TokenModel tokenModel)
+        public async Task<IActionResult> GoogleResponse([FromBody] TokenViewModel tokenModel)
         {
             using var client = new HttpClient();
             var req = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token");

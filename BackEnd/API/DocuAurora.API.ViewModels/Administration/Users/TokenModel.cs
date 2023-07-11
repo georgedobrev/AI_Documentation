@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DocuAurora.API.ViewModels.Administration.Users
 {
-    public class TokenModel
+    public class TokenViewModel
     {
         public string Token { get; set; }
     }
