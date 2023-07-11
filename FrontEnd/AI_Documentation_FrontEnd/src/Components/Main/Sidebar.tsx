@@ -1,18 +1,20 @@
+import React from "react";
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-import React from 'react';
-import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
-const sidebarItems = ['Inbox', 'Starred', 'Send email', 'Drafts'];
-
+const sidebarItems = ["Inbox", "Starred", "Send email", "Drafts"];
 const Sidebar: React.FC = () => {
   return (
-    <Drawer
-      variant="permanent"
-      anchor="left"
-    >
+    <Drawer variant="permanent" anchor="left">
       <Box display="flex" flexDirection="column" height="100%">
         <List>
           {sidebarItems.map((text, index) => (
@@ -37,6 +39,7 @@ const Sidebar: React.FC = () => {
       </Box>
     </Drawer>
   );
-}
+};
 
 export default Sidebar;
+
