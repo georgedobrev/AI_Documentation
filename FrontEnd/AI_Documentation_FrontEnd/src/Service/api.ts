@@ -59,3 +59,8 @@ export const resetPassword = async (email: string) => {
     }
     return response.data;
   };
+
+  export const postRabbitMQMessage = async (message: string): Promise<any> => {
+    const response = await instance.post('/RabittMQ/message', { message });
+    return response.data;
+  };
