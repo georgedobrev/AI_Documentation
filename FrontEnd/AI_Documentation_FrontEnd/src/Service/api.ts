@@ -42,6 +42,12 @@ interface RegisterData {
     token: string;
   }
   
+  interface RabbitMQMessage {
+    id: number;
+    message: string;
+    timestamp: string;
+  }
+
   export const registerUser = async (data: RegisterData): Promise<TokenResponse> => {
     const response: AxiosResponse<TokenResponse> = await instance.post('/Account/register', data);
     setBearerToken(response.data.token);
@@ -72,4 +78,11 @@ interface RegisterData {
     }
     return response.data;
   };
+
+ 
   
+  export const postRabbitMQMessage = async (message: string): Promise<RabbitMQMessage> => {
+    const response = await instance.post('/RabittMQ/message', { message });
+    return response.data;
+  };
+
